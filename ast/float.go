@@ -25,7 +25,7 @@ func (self *Float) Type() string {
 }
 
 func (self *Float) Eval(env *scope.Scope) value.Value {
-  return value.Float{Value: self.value}
+  return value.NewFloat(self.value)
 }
 
 func (self *Float) String() string {

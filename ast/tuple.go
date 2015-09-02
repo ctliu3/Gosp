@@ -18,7 +18,7 @@ func (self *Tuple) Type() string {
 }
 
 func (self *Tuple) Eval(env *scope.Scope) value.Value {
-  return value.Int{Value: 5}
+  return value.NewInt(5)
 }
 
 func (self *Tuple) String() string {

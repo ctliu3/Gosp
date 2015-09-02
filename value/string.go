@@ -4,6 +4,6 @@ type String struct {
   value string
 }
 
-func (self String) String() string {
+func (self *String) String() string {
   return self.value
 }

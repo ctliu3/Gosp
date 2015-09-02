@@ -18,7 +18,7 @@ func (self *Ident) Type() string {
 }
 
 func (self *Ident) Eval(env *scope.Scope) value.Value {
-  return value.Int{Value: 5}
+  return value.NewInt(5)
   //var val value.Int
   //if ok := env.Lookup(self.name); ok {
     //return true
