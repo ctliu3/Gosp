@@ -1,9 +1,13 @@
 package value
 
 type String struct {
-  value string
+  Value string
+}
+
+func NewString(val string) *String {
+  return &String{Value: val}
 }
 
 func (self *String) String() string {
-  return self.value
+  return self.Value
 }

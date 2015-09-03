@@ -1,7 +1,6 @@
 package lexer
 
 import (
-  "fmt"
   "unicode"
   "strings"
   "unicode/utf8"
@@ -133,7 +132,7 @@ func lexWhitespace(l *Lexer) StateFn {
     if next == EOF {
       panic("expected number or procedure")
     }
-    if unicode.IsDigit(next) {
+    if unicode.IsDigit(r) && (isSpace(next) || unicode.IsDigit(next)) {
       return lexNumber
     }
     fallthrough
@@ -183,7 +182,6 @@ func lexNumber(l *Lexer) StateFn {
 }
 
 func lexEof(l *Lexer) StateFn {
-  fmt.Println("eof")
   l.emit(TokenEOF)
   return nil
 }
