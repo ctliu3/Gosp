@@ -5,7 +5,7 @@ import (
   "os"
   "bufio"
 
-  . "github.com/ctliu3/gosp/repl"
+  . "github.com/ctliu3/gosp/eval"
 )
 
 const version = "0.1"
@@ -21,7 +21,7 @@ func main() {
       fmt.Println("error, try again")
       continue
     }
-    res := REPL(string(expr))
+    res := Eval(string(expr))
     fmt.Println(res)
 
     defer func() {

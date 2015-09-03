@@ -1,4 +1,0 @@
-package eval
-
-func Eval() {
-}
