@@ -1,6 +1,7 @@
 package lexer
 
 import (
+  "fmt"
   "unicode"
   "strings"
   "unicode/utf8"
@@ -12,12 +13,11 @@ const (
   TokenError TokenType = iota
 
   TokenEOF
-  TokenIdent // letters, >, etc
+  TokenIdent // if, define, >, etc
   TokenLParen // (
   TokenRParen // )
-  TokenNumber
-  TokenInt
-  TokenFloat
+  TokenNumber // only handle int/float, not include complex number
+  TokenString
 )
 
 const EOF = -1
@@ -28,18 +28,16 @@ type Token struct {
 }
 
 func (self *Token) String() string {
-  return self.Name
-  //switch self.Type {
-  //case TokenEOF:
-    //return "EOF"
-  //case TokenError:
-    //return self.Name
-  //}
-  //return "nil"
-  //if len(self.Name) > 10 {
-    //return fmt.Sprintf("%.10q...", self.Name)
-  //}
-  //return fmt.Sprintf("%q", self.Name)
+  switch self.Type {
+  case TokenEOF:
+    return "EOF"
+  case TokenError:
+    return self.Name
+  }
+  if len(self.Name) > 10 {
+    return fmt.Sprintf("%.10q...", self.Name)
+  }
+  return fmt.Sprintf("%q", self.Name)
 }
 
 type Lexer struct {
@@ -81,8 +79,9 @@ func (self *Lexer) run() {
   close(self.tokenChan)
 }
 
-func (self *Lexer) emit(type_ TokenType) {
-  self.tokenChan <- Token{type_, self.expr[self.start:self.pos]}
+func (self *Lexer) emit(typ TokenType) {
+  //fmt.Printf("%q, ", self.expr[self.start:self.pos])
+  self.tokenChan <- Token{typ, self.expr[self.start:self.pos]}
   self.start = self.pos
 }
 
@@ -97,12 +96,12 @@ func (self *Lexer) next() rune {
   return cur
 }
 
-func (self *Lexer) ignore() {
-  self.start = self.pos
-}
-
 func (self *Lexer) backward() {
   self.pos -= self.width
+}
+
+func (self *Lexer) ignore() {
+  self.start = self.pos
 }
 
 // Return the next rune and not move the self.pos variable.
@@ -112,12 +111,30 @@ func (self *Lexer) peek() rune {
   return cur
 }
 
+// Consume the next rune, which is included in a given valid set.
+func (self *Lexer) accept (valid string) bool {
+  if strings.ContainsRune(valid, self.next()) {
+    return true
+  }
+  self.backward()
+  return false
+}
+
+// Consume the continuous runes, which are included in a given valid set.
+func (self *Lexer) acceptRun(valid string) {
+  for strings.ContainsRune(valid, self.next()) {
+  }
+  self.backward()
+}
+
+func (self *Lexer) errorf(format string, args ...interface{}) StateFn {
+  self.tokenChan <- Token{TokenError, fmt.Sprintf(format, args...)}
+  return nil
+}
+
 func lexWhitespace(l *Lexer) StateFn {
   var r rune
   for r = l.next(); isSpace(r); r = l.next() {
-  }
-  if l.pos >= len(l.expr) {
-    return lexEof
   }
   l.backward()
   l.ignore()
@@ -127,22 +144,32 @@ func lexWhitespace(l *Lexer) StateFn {
     return lexLeftParen
   case r == ')':
     return lexRightParen
-  case r == '-' || r == '+' || unicode.IsDigit(r):
+  case r == '"':
+    return lexQuote
+  case r == '-' || r == '+' || unicode.IsDigit(r): // number or ident
     next := l.peek()
     if next == EOF {
       panic("expected number or procedure")
     }
-    if unicode.IsDigit(r) && (isSpace(next) || unicode.IsDigit(next)) {
+    if isSpace(l.peek()) {
+      return lexIdentifier
+    }
+    if scanNumber(l) {
       return lexNumber
     }
-    fallthrough
+
   case isAlphaNumeric(r):
     l.backward()
     return lexIdentifier
   case r == EOF:
-    return lexEof
+    return lexEOF
   }
 
+  return nil
+}
+
+func lexError(l *Lexer) StateFn {
+  l.emit(TokenError)
   return nil
 }
 
@@ -166,7 +193,7 @@ func lexAlphaNumber(l *Lexer) StateFn {
 }
 
 func lexIdentifier(l *Lexer) StateFn {
-  for r := l.next(); r != EOF && isAlphaNumeric(r); r = l.next() {
+  for r := l.next(); isAlphaNumeric(r); r = l.next() {
   }
   l.backward()
   l.emit(TokenIdent)
@@ -174,16 +201,55 @@ func lexIdentifier(l *Lexer) StateFn {
 }
 
 func lexNumber(l *Lexer) StateFn {
-  for r := l.next(); r != EOF && unicode.IsDigit(r); r = l.next() {
-  }
-  l.backward()
-  l.emit(TokenInt)
+  l.emit(TokenNumber)
   return lexWhitespace
 }
 
-func lexEof(l *Lexer) StateFn {
+// "hello", "he\"llo"
+func lexQuote(l *Lexer) StateFn {
+Loop:
+  for {
+    switch l.next() {
+    case '\\':
+      if r := l.next(); r == '\n' || r == EOF {
+        return l.errorf("unexpeced eof of string?")
+      }
+    case EOF:
+      return l.errorf("unexpeced eof of string?")
+    case '"':
+      break Loop
+    }
+  }
+  if isAlphaNumeric(l.peek()) {
+    return l.errorf("unexpeced string?")
+  }
+  l.emit(TokenString)
+  return lexWhitespace
+}
+
+func lexEOF(l *Lexer) StateFn {
   l.emit(TokenEOF)
   return nil
+}
+
+// 3e3.4 is illegal
+func scanNumber(l *Lexer) bool {
+  l.accept("+-")
+  digits := "0123456789"
+  l.acceptRun(digits)
+  if l.accept(".") {
+    l.acceptRun(digits)
+  }
+  if l.accept("eE") {
+    l.accept("+-")
+    l.acceptRun(digits)
+  }
+  if isAlphaNumeric(l.peek()) {
+    l.errorf("unexpeced number?")
+    return false
+  }
+
+  return true
 }
 
 func isSpace(r rune) bool {

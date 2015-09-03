@@ -2,6 +2,7 @@ package parser
 
 import (
   "fmt"
+  "strings"
 
   "github.com/ctliu3/gosp/ast"
   "github.com/ctliu3/gosp/lexer"
@@ -26,20 +27,24 @@ func (self *Parser) parse(tuples *[]ast.Node, dep int) {
   for token := self.l.NextToken(); token.Type != lexer.TokenEOF; token = self.l.NextToken() {
 
     switch token.Type {
+    case lexer.TokenString:
+      *tuples = append(*tuples, ast.NewString(token.Name))
     case lexer.TokenIdent:
       *tuples = append(*tuples, ast.NewIdent(token.Name))
-    case lexer.TokenInt:
-      *tuples = append(*tuples, ast.NewInt(token.Name))
-    case lexer.TokenFloat:
-      *tuples = append(*tuples, ast.NewFloat(token.Name))
+    case lexer.TokenNumber:
+      if strings.ContainsAny(token.Name, "Ee.") {
+        *tuples = append(*tuples, ast.NewFloat(token.Name))
+      } else {
+        *tuples = append(*tuples, ast.NewInt(token.Name))
+      }
     case lexer.TokenLParen:
       sub := make([]ast.Node, 0)
       self.parse(&sub, dep + 1)
       *tuples = append(*tuples, ast.NewTuple(sub))
     case lexer.TokenRParen:
       return
-    //default:
-      //panic("unexpeced token")
+    default:
+      panic("unexpeced token")
     }
   }
 }
