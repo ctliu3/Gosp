@@ -24,7 +24,6 @@ func ParseFromString(expr string) []ast.Node {
 
 func (self *Parser) parse(tuples *[]ast.Node, dep int) {
   for token := self.l.NextToken(); token.Type != lexer.TokenEOF; token = self.l.NextToken() {
-    fmt.Println(token.Name)
 
     switch token.Type {
     case lexer.TokenIdent:
@@ -60,6 +59,8 @@ func parseNode(tuple ast.Node) ast.Node {
     return parseDefine(t)
   case const_.IF:
     return parseIf(t)
+  default:
+    return parseProc(t)
   }
   return nil
 }
@@ -81,4 +82,14 @@ func parseIf(node *ast.Tuple) ast.Node {
   alt := parseNode(node.Nodes[3])
 
   return ast.NewIf(test, conseq, alt)
+}
+
+func parseProc(node *ast.Tuple) ast.Node {
+  fmt.Println("proc")
+  nexpr := len(node.Nodes)
+  fmt.Println(nexpr)
+  name := node.Nodes[0].(*ast.Ident).Name
+  args := node.Nodes[1:]
+
+  return ast.NewProc(name, args)
 }

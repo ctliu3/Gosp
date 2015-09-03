@@ -6,15 +6,15 @@ import (
 )
 
 type Ident struct {
-  name string
+  Name string
 }
 
 func NewIdent(name string) *Ident {
-  return &Ident{name: name}
+  return &Ident{Name: name}
 }
 
 func (self *Ident) Type() string {
-  return self.name
+  return self.Name
 }
 
 func (self *Ident) Eval(env *scope.Scope) value.Value {
