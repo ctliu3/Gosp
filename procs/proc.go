@@ -1,9 +1,9 @@
-package funcs
+package procs
 
 import (
   "github.com/ctliu3/gosp/value"
 )
 
-type Func interface {
+type Proc interface {
   Call(...value.Value) value.Value
 }

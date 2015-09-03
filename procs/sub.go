@@ -1,4 +1,4 @@
-package funcs
+package procs
 
 import (
   "github.com/ctliu3/gosp/value"

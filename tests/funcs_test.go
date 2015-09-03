@@ -2,7 +2,7 @@ package tests
 
 import (
   "testing"
-  . "github.com/ctliu3/gosp/funcs"
+  . "github.com/ctliu3/gosp/procs"
   . "github.com/ctliu3/gosp/value"
 )
 
@@ -30,4 +30,11 @@ func TestSub(t *testing.T) {
   } else if val.Value != -15.4 {
     t.Error("add function: return value error")
   }
+}
+
+func TestDisplay(t *testing.T) {
+  str := NewString("hello world")
+  fun := NewDisplay()
+
+  fun.Call(str)
 }
