@@ -2,10 +2,10 @@ package ast
 
 import (
   "fmt"
-  "strconv"
 
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
+  const_ "github.com/ctliu3/gosp/constant"
 )
 
 type String struct {
@@ -17,7 +17,7 @@ func NewString(name string) *String {
 }
 
 func (self *String) Type() string {
-  return "string"
+  return const_.STRING
 }
 
 func (self *String) Eval(env *scope.Scope) value.Value {

@@ -6,6 +6,7 @@ import (
 
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
+  const_ "github.com/ctliu3/gosp/constant"
 )
 
 type Float struct {
@@ -21,7 +22,7 @@ func NewFloat(name string) *Float {
 }
 
 func (self *Float) Type() string {
-  return "float"
+  return const_.FLOAT
 }
 
 func (self *Float) Eval(env *scope.Scope) value.Value {

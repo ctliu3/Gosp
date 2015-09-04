@@ -15,7 +15,16 @@ func lex(l *lexer.Lexer) string {
   return strings.Join(res, " ")
 }
 
-func TestLexer(t *testing.T) {
+func check(t *testing.T, mp map[string]string) {
+  for raw, slex := range mp {
+    res := lex(lexer.Lex("test", raw))
+    if res != slex {
+      t.Errorf("fail in case: %q, err: %q", raw, res)
+    }
+  }
+}
+
+func TestBasic(t *testing.T) {
   mp := map[string]string {
     "(define a 10)": "( define a 10 )",
     "(define a \"hello\")": "( define a \"hello\" )",
@@ -27,10 +36,24 @@ func TestLexer(t *testing.T) {
     "(if (> a 3) (display a) (newline))": "( if ( > a 3 ) ( display a ) ( newline ) )",
   }
 
-  for raw, slex := range mp {
-    res := lex(lexer.Lex("test", raw))
-    if res != slex {
-      t.Errorf("fail in case: %q, err: %q", raw, res)
-    }
+  check(t, mp)
+}
+
+func TestSharp(t *testing.T) {
+  mp := map[string]string {
+    `(define a #t)`: `( define a #t )`,
+    `(+ #d10 #xF)`: `( + #d10 #xF )`,
+    `(+ #\b #\A)`: `( + #\b #\A )`,
+    `(define a #\space)`: `( define a #\space )`,
   }
+
+  check(t, mp)
+}
+
+func TestQuote(t *testing.T) {
+  mp := map[string]string {
+    `(define a 'hello)`: `( define a 'hello )`,
+  }
+
+  check(t, mp)
 }

@@ -27,8 +27,14 @@ func (self *Parser) parse(tuples *[]ast.Node, dep int) {
   for token := self.l.NextToken(); token.Type != lexer.TokenEOF; token = self.l.NextToken() {
 
     switch token.Type {
+    case lexer.TokenBool:
+      *tuples = append(*tuples, ast.NewBool(token.Name))
+    case lexer.TokenChar:
+      *tuples = append(*tuples, ast.NewChar(token.Name))
     case lexer.TokenString:
       *tuples = append(*tuples, ast.NewString(token.Name))
+    case lexer.TokenQuote:
+      *tuples = append(*tuples, ast.NewQuote(token.Name))
     case lexer.TokenIdent:
       *tuples = append(*tuples, ast.NewIdent(token.Name))
     case lexer.TokenNumber:

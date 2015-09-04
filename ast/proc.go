@@ -2,9 +2,11 @@ package ast
 
 import (
   "fmt"
+
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   "github.com/ctliu3/gosp/procs"
+  const_ "github.com/ctliu3/gosp/constant"
 )
 
 type Proc struct {
@@ -17,7 +19,7 @@ func NewProc(name string, args []Node) *Proc {
 }
 
 func (self *Proc) Type() string {
-  return self.name
+  return const_.PROC
 }
 
 func (self *Proc) Eval(env *scope.Scope) value.Value {

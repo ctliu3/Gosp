@@ -17,7 +17,7 @@ func NewIf(test Node, conseq Node, alt Node) *If {
 }
 
 func (self *If) Type() string {
-  return "If"
+  return const_.IF
 }
 
 func (self *If) Eval(env *scope.Scope) value.Value {

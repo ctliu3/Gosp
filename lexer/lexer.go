@@ -13,11 +13,17 @@ const (
   TokenError TokenType = iota
 
   TokenEOF
-  TokenIdent // if, define, >, etc
   TokenLParen // (
   TokenRParen // )
+  TokenLVect // [
+  TokenRVect // ]
+  TokenIdent // if, define, >, etc
   TokenNumber // only handle int/float, not include complex number
-  TokenString
+  TokenQuote // '<datum>
+  TokenString // "str"
+  TokenVect // [1 2 3]
+  TokenBool // #t, #f
+  TokenChar // #\a, #\space
 )
 
 const EOF = -1
@@ -144,8 +150,16 @@ func lexWhitespace(l *Lexer) StateFn {
     return lexLeftParen
   case r == ')':
     return lexRightParen
+  case r == ']':
+    return lexLeftVect
+  case r == '[':
+    return lexRightVect
   case r == '"':
+    return lexString
+  case r == '\'':
     return lexQuote
+  case r == '#':
+    return lexSharp
   case r == '-' || r == '+' || unicode.IsDigit(r): // number or ident
     next := l.peek()
     if next == EOF {
@@ -183,6 +197,16 @@ func lexRightParen(l *Lexer) StateFn {
   return lexWhitespace
 }
 
+func lexLeftVect(l *Lexer) StateFn {
+  l.emit(TokenLVect)
+  return lexWhitespace
+}
+
+func lexRightVect(l *Lexer) StateFn {
+  l.emit(TokenRVect)
+  return lexWhitespace
+}
+
 func lexAlphaNumber(l *Lexer) StateFn {
   r := l.peek()
   if unicode.IsLetter(r) {
@@ -205,8 +229,13 @@ func lexNumber(l *Lexer) StateFn {
   return lexWhitespace
 }
 
+func lexChar(l *Lexer) StateFn {
+  l.emit(TokenChar)
+  return lexWhitespace
+}
+
 // "hello", "he\"llo"
-func lexQuote(l *Lexer) StateFn {
+func lexString(l *Lexer) StateFn {
 Loop:
   for {
     switch l.next() {
@@ -225,6 +254,59 @@ Loop:
   }
   l.emit(TokenString)
   return lexWhitespace
+}
+
+func lexQuote(l *Lexer) StateFn {
+  for r := l.next(); isAlphaNumeric(r); r = l.next() {
+  }
+  l.backward()
+  l.emit(TokenQuote)
+  return lexWhitespace
+}
+
+func lexBool(l *Lexer) StateFn {
+  l.emit(TokenBool)
+  return lexWhitespace
+}
+
+func lexSharp(l *Lexer) StateFn {
+  r := l.next()
+  var digits string
+
+  switch r {
+  case 't', 'f':
+    if !isAlphaNumeric(l.peek()) {
+      return lexBool
+    }
+  case '\\':
+    if isChar(l.peek()) {
+      for unicode.IsLetter(l.next()) {
+      }
+      l.backward()
+      if !isAlphaNumeric(l.peek()) {
+        return lexChar
+      }
+    }
+  case 'b':
+    digits = "01"
+    fallthrough
+  case 'o':
+    digits = "01234567"
+    fallthrough
+  case 'd':
+    digits = "0123456789"
+    fallthrough
+  case 'x':
+    digits = "0123456789ABCFEF"
+    if strings.ContainsRune(digits, l.peek()) {
+      l.acceptRun(digits)
+      if !isAlphaNumeric(l.peek()) {
+        return lexNumber
+      }
+    }
+  }
+
+  return l.errorf("unexpeced charactor after #?")
 }
 
 func lexEOF(l *Lexer) StateFn {
@@ -257,5 +339,9 @@ func isSpace(r rune) bool {
 }
 
 func isAlphaNumeric(r rune) bool {
-  return strings.ContainsRune("+-*/<>=-?", r) || unicode.IsDigit(r) || unicode.IsLetter(r)
+  return strings.ContainsRune(`!$%&*+-./:<=>?@^_~`, r) || unicode.IsDigit(r) || unicode.IsLetter(r)
+}
+
+func isChar(r rune) bool {
+  return strings.ContainsRune(` ()[]`, r) || unicode.IsLetter(r)
 }
