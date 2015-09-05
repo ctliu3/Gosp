@@ -3,8 +3,10 @@ package ast
 import (
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
+  const_ "github.com/ctliu3/gosp/constant"
 )
 
+// If one Node is Tuple, it means that it is surrounded by `()'.
 type Tuple struct {
   Nodes []Node
 }
@@ -14,7 +16,7 @@ func NewTuple(nodes []Node) *Tuple {
 }
 
 func (self *Tuple) Type() string {
-  return "tuple"
+  return const_.TUPLE
 }
 
 func (self *Tuple) Eval(env *scope.Scope) value.Value {
@@ -22,5 +24,5 @@ func (self *Tuple) Eval(env *scope.Scope) value.Value {
 }
 
 func (self *Tuple) String() string {
-  return "tuple"
+  return const_.TUPLE
 }

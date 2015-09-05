@@ -13,6 +13,8 @@ const (
   WHEN = "when"
   TRUE = "#t"
   FALSE = "#f"
+  LAMBDA = "lambda"
+  TUPLE = "tuple"
 
   CHAR = "char"
   STRING = "string"
@@ -20,5 +22,5 @@ const (
   FLOAT = "float"
   PROC = "proc"
   BOOL = "bool"
-  Quote = "quote"
+  QUOTE = "quote"
 )

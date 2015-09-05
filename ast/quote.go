@@ -15,7 +15,7 @@ func NewQuote(name string) *Quote {
 }
 
 func (self *Quote) Type() string {
-  return const_.Quote
+  return const_.QUOTE
 }
 
 func (self *Quote) Eval(env *scope.Scope) value.Value {
