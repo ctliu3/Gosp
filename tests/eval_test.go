@@ -16,7 +16,8 @@ func check(t *testing.T, mp map[string]string) {
 
 func TestDefineValue(t *testing.T) {
   mp := map[string]string {
-    `(define abc 3) (+ abc 0)`: `3`,
+    //`(define abc 3) (+ abc 0)`: `3`,
+    `(define a (+ 8 2)) (+ a 0)`: `10`,
   }
   check(t, mp)
 }

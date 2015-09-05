@@ -20,6 +20,13 @@ func ParseFromString(expr string) []ast.Node {
   parser := &Parser{lexer.Lex("gosp", expr)}
   tuples := make([]ast.Node, 0)
   parser.parse(&tuples, 0)
+
+  // For debugging.
+  for _, node := range tuples {
+    printType(node)
+    fmt.Println()
+  }
+
   return parseList(&tuples)
 }
 
@@ -139,4 +146,18 @@ func parseProc(node *ast.Tuple) ast.Node {
   args := node.Nodes[1:]
 
   return ast.NewProc(name, args)
+}
+
+func printType(node ast.Node) {
+  switch node.(type) {
+  case *ast.Tuple:
+    t := node.(*ast.Tuple)
+    fmt.Printf("(")
+    for _, node := range t.Nodes {
+      printType(node)
+    }
+    fmt.Printf(")")
+  default:
+    fmt.Printf("%q ", node.Type())
+  }
 }

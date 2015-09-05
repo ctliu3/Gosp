@@ -165,7 +165,7 @@ func lexWhitespace(l *Lexer) StateFn {
     if next == EOF {
       panic("expected number or procedure")
     }
-    if isSpace(l.peek()) {
+    if !unicode.IsDigit(r) && isSpace(next) {
       return lexIdentifier
     }
     if scanNumber(l) {
