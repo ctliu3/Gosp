@@ -1,6 +1,7 @@
 package scope
 
 import (
+  "fmt"
   "github.com/ctliu3/gosp/value"
   "github.com/ctliu3/gosp/procs"
 )
@@ -25,9 +26,9 @@ type Object struct {
 
 func NewObj(data interface{}) *Object {
   switch data.(type) {
-  case value.Value:
+  case value.Value: // implement String() method
     return &Object{Var, data}
-  case procs.Proc:
+  case procs.Proc: // implement Call() method
     return &Object{Proc, data}
   }
   return nil
@@ -55,6 +56,7 @@ func (self *Scope) Insert(name string, obj *Object) (alt *Object) {
 }
 
 func (self *Scope) Lookup(name string, recur bool) *Object {
+  fmt.Println("#Lookup(), " + name)
   if !recur {
     return self.objects[name]
   }

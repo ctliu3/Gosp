@@ -1,31 +1,35 @@
 package ast
 
 import (
+  //"fmt"
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
 )
 
 type Ident struct {
-  Name string
+  name string
 }
 
 func NewIdent(name string) *Ident {
-  return &Ident{Name: name}
+  return &Ident{name}
 }
 
 func (self *Ident) Type() string {
-  return self.Name
+  return self.name
 }
 
 func (self *Ident) Eval(env *scope.Scope) value.Value {
-  return value.NewInt(5)
-  //var val value.Int
-  //if ok := env.Lookup(self.name); ok {
-    //return true
-  //}
-  //return false
+  if obj := env.Lookup(self.name, true); obj != nil {
+    if obj.Type == scope.Var {
+      val := obj.Data.(value.Value)
+      return val
+    } else {
+      return nil // TODO
+    }
+  }
+  return nil
 }
 
 func (self *Ident) String() string {
-  return ""
+  return self.name
 }

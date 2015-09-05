@@ -2,6 +2,8 @@ package eval
 
 import (
   "fmt"
+  "strings"
+
   "github.com/ctliu3/gosp/parser"
   "github.com/ctliu3/gosp/scope"
 )
@@ -11,8 +13,13 @@ func Eval(expr string) string {
   fmt.Printf("#ast = %d\n", len(nodes))
 
   env := scope.NewScope(nil)
+  var res []string
   for _, node := range nodes {
-    fmt.Printf("%s\n", node.Eval(env))
+    fmt.Println("#Eval(): " + node.Type())
+    if val := node.Eval(env); val != nil {
+      res = append(res, val.String())
+    }
   }
-  return ""
+
+  return strings.Join(res, " ")
 }

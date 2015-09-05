@@ -23,30 +23,30 @@ func ParseFromString(expr string) []ast.Node {
   return parseList(&tuples)
 }
 
-func (self *Parser) parse(tuples *[]ast.Node, dep int) {
+func (self *Parser) parse(nodes *[]ast.Node, dep int) {
   for token := self.l.NextToken(); token.Type != lexer.TokenEOF; token = self.l.NextToken() {
 
     switch token.Type {
     case lexer.TokenBool:
-      *tuples = append(*tuples, ast.NewBool(token.Name))
+      *nodes = append(*nodes, ast.NewBool(token.Name))
     case lexer.TokenChar:
-      *tuples = append(*tuples, ast.NewChar(token.Name))
+      *nodes = append(*nodes, ast.NewChar(token.Name))
     case lexer.TokenString:
-      *tuples = append(*tuples, ast.NewString(token.Name))
+      *nodes = append(*nodes, ast.NewString(token.Name))
     case lexer.TokenQuote:
-      *tuples = append(*tuples, ast.NewQuote(token.Name))
+      *nodes = append(*nodes, ast.NewQuote(token.Name))
     case lexer.TokenIdent:
-      *tuples = append(*tuples, ast.NewIdent(token.Name))
+      *nodes = append(*nodes, ast.NewIdent(token.Name))
     case lexer.TokenNumber:
       if strings.ContainsAny(token.Name, "Ee.") {
-        *tuples = append(*tuples, ast.NewFloat(token.Name))
+        *nodes = append(*nodes, ast.NewFloat(token.Name))
       } else {
-        *tuples = append(*tuples, ast.NewInt(token.Name))
+        *nodes = append(*nodes, ast.NewInt(token.Name))
       }
     case lexer.TokenLParen:
       sub := make([]ast.Node, 0)
       self.parse(&sub, dep + 1)
-      *tuples = append(*tuples, ast.NewTuple(sub))
+      *nodes = append(*nodes, ast.NewTuple(sub))
     case lexer.TokenRParen:
       return
     default:
@@ -63,29 +63,48 @@ func parseList(tuples *[]ast.Node) []ast.Node {
   return nodes
 }
 
-func parseNode(tuple ast.Node) ast.Node {
-  t := tuple.(*ast.Tuple)
-  switch t.Nodes[0].Type() {
-  case const_.DEFINE:
-    return parseDefine(t)
-  case const_.IF:
-    return parseIf(t)
-  default:
-    return parseProc(t)
+// Each node has differnt type.
+// 1. Tuple, the first element in tuple is the identifier (such as `if',
+// `begin', `lambda', etc) of the node.
+// 2. Var or ..
+func parseNode(node ast.Node) ast.Node {
+  switch node.(type) {
+  case *ast.Tuple:
+    t := node.(*ast.Tuple)
+    switch t.Nodes[0].Type() {
+    case const_.DEFINE:
+      return parseDefine(t)
+    case const_.LAMBDA:
+      return parseLambda(t)
+    case const_.IF:
+      return parseIf(t)
+    default:
+      return parseProc(t)
+    }
+  case *ast.Ident:
+    return parseIdent(&node)
   }
-  return nil
+
+  return node
 }
 
 func parseDefine(node *ast.Tuple) ast.Node {
-  fmt.Println("define")
-  return nil
-  //return &NewIf{}
+  fmt.Println("#parseDefine()")
+  nNode := len(node.Nodes)
+  if nNode != 3 {
+    panic("unexpeced define expression")
+  }
+  //formals := parseNode(node.Nodes[1])
+  formals := node.Nodes[1]
+  body := parseNode(node.Nodes[2])
+
+  return ast.NewDefine(formals, body)
 }
 
 func parseIf(node *ast.Tuple) ast.Node {
-  fmt.Println("if")
-  nexpr := len(node.Nodes)
-  if nexpr != 4 {
+  fmt.Println("#parseIf()")
+  nNode := len(node.Nodes)
+  if nNode != 4 {
     panic("unexpeced if expression")
   }
   test := parseNode(node.Nodes[1])
@@ -95,11 +114,28 @@ func parseIf(node *ast.Tuple) ast.Node {
   return ast.NewIf(test, conseq, alt)
 }
 
+func parseLambda(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseLambda()")
+  nNode := len(node.Nodes)
+  if nNode != 3 {
+    panic("unexpeced lambda proc")
+  }
+  formals := parseNode(node.Nodes[1])
+  body := parseNode(node.Nodes[2])
+
+  return ast.NewLambda(formals, body)
+}
+
+func parseIdent(node *ast.Node) ast.Node {
+  return nil
+  //return (*node).(*ast.Ident)
+}
+
 func parseProc(node *ast.Tuple) ast.Node {
-  fmt.Println("proc")
-  nexpr := len(node.Nodes)
-  fmt.Println(nexpr)
-  name := node.Nodes[0].(*ast.Ident).Name
+  fmt.Println("#parseProc()")
+  nNode := len(node.Nodes)
+  fmt.Println(nNode)
+  name := node.Nodes[0].(*ast.Ident).String()
   args := node.Nodes[1:]
 
   return ast.NewProc(name, args)

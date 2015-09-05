@@ -22,6 +22,8 @@ func (self *Add) Call(args ...value.Value) value.Value {
     case *value.Float:
       isfloat = true
       res += item.(*value.Float).Value
+    default:
+      panic("unexpeced type for add function")
     }
   }
   if isfloat {

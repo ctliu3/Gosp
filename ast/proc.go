@@ -1,8 +1,6 @@
 package ast
 
 import (
-  "fmt"
-
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   "github.com/ctliu3/gosp/procs"
@@ -34,7 +32,6 @@ func (self *Proc) Eval(env *scope.Scope) value.Value {
     args := make([]value.Value, len(self.args))
     for i := 0; i < len(self.args); i++ {
       args[i] = self.args[i].Eval(env)
-      fmt.Println("#" + args[i].String())
     }
 
     return proc.Call(args...)
