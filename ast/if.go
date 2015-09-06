@@ -1,6 +1,7 @@
 package ast
 
 import (
+  "fmt"
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   const_ "github.com/ctliu3/gosp/constant"
@@ -22,7 +23,8 @@ func (self *If) Type() string {
 
 func (self *If) Eval(env *scope.Scope) value.Value {
   res := self.test.Eval(env)
-  if res.String() == const_.TRUE {
+  fmt.Println("-->" + res.String())
+  if res.String() != const_.FALSE {
     return self.conseq.Eval(env)
   } else {
     return self.alt.Eval(env)

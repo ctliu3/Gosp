@@ -16,11 +16,18 @@ func check(t *testing.T, mp map[string]string) {
 
 func TestDefineValue(t *testing.T) {
   mp := map[string]string {
-    //`(define abc 3) (+ abc 0)`: `3`,
+    `(define abc 3) (+ abc 0)`: `3`,
     `(define a (+ 8 2)) (+ a 0)`: `10`,
   }
   check(t, mp)
 }
+
+//func TestDefineProc(t *testing.T) {
+  //mp := map[string]string {
+    //`(define (f x  y) (+ x y)) (f 1 2)`: `3`,
+  //}
+  //check(t, mp)
+//}
 
 func TestAdd(t *testing.T) {
   mp := map[string]string {
@@ -32,6 +39,23 @@ func TestAdd(t *testing.T) {
 func TestSub(t *testing.T) {
   mp := map[string]string {
     `(define a 3) (define b 4) (- a b)`: `-1`,
+  }
+  check(t, mp)
+}
+
+func TestGT(t *testing.T) {
+  mp := map[string]string {
+    `(> 2 3)`: `#f`,
+  }
+  check(t, mp)
+}
+
+func TestIf(t *testing.T) {
+  mp := map[string]string {
+    `(if 1 0 1)`: `0`,
+    `(if (> 2 3) 0 1)`: `1`,
+    `(if (> 2 3 1) 0 1)`: `1`,
+    `(if (if (> 2 3) 0 1) 3 4)`: `3`,
   }
   check(t, mp)
 }

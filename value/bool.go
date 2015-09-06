@@ -1,7 +1,7 @@
 package value
 
 import (
-  "fmt"
+  const_ "github.com/ctliu3/gosp/constant"
 )
 
 type Bool struct {
@@ -13,5 +13,8 @@ func NewBool(val bool) *Bool {
 }
 
 func (self *Bool) String() string {
-  return fmt.Sprintf("%t", self.Value)
+  if self.Value {
+    return const_.TRUE
+  }
+  return const_.FALSE
 }

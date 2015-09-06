@@ -140,8 +140,6 @@ func parseIdent(node *ast.Node) ast.Node {
 
 func parseProc(node *ast.Tuple) ast.Node {
   fmt.Println("#parseProc()")
-  nNode := len(node.Nodes)
-  fmt.Println(nNode)
   name := node.Nodes[0].(*ast.Ident).String()
   args := node.Nodes[1:]
 
@@ -152,7 +150,7 @@ func printType(node ast.Node) {
   switch node.(type) {
   case *ast.Tuple:
     t := node.(*ast.Tuple)
-    fmt.Printf("(")
+    fmt.Printf("( ")
     for _, node := range t.Nodes {
       printType(node)
     }

@@ -33,7 +33,6 @@ func (self *Define) Eval(env *scope.Scope) value.Value {
   if self.expr.Type() == const_.LAMBDA {
     fmt.Println("#0")
   }
-  fmt.Println("#1")
   var_ := self.var_.(*Ident)
   val := self.expr.Eval(env)
   env.Insert(var_.String(), scope.NewObj(val))
