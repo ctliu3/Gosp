@@ -75,9 +75,11 @@ func parseList(tuples *[]ast.Node) []ast.Node {
 // `begin', `lambda', etc) of the node.
 // 2. Var or ..
 func parseNode(node ast.Node) ast.Node {
+  fmt.Println("#parseNode")
   switch node.(type) {
   case *ast.Tuple:
     t := node.(*ast.Tuple)
+    fmt.Println(t.Nodes[0].Type())
     switch t.Nodes[0].Type() {
     case const_.DEFINE:
       return parseDefine(t)
@@ -98,6 +100,7 @@ func parseNode(node ast.Node) ast.Node {
 func parseDefine(node *ast.Tuple) ast.Node {
   fmt.Println("#parseDefine()")
   nNode := len(node.Nodes)
+  fmt.Println(nNode)
   if nNode != 3 {
     panic("unexpeced define expression")
   }
@@ -125,12 +128,13 @@ func parseLambda(node *ast.Tuple) ast.Node {
   fmt.Println("#parseLambda()")
   nNode := len(node.Nodes)
   if nNode != 3 {
-    panic("unexpeced lambda proc")
+    panic("unexpeced lambda procedure")
   }
-  formals := parseNode(node.Nodes[1])
+
+  formals := node.Nodes[1]
   body := parseNode(node.Nodes[2])
 
-  return ast.NewLambda(formals, body)
+  return ast.NewLambda(formals, body, nil)
 }
 
 func parseIdent(node *ast.Node) ast.Node {
@@ -140,10 +144,32 @@ func parseIdent(node *ast.Node) ast.Node {
 
 func parseProc(node *ast.Tuple) ast.Node {
   fmt.Println("#parseProc()")
-  name := node.Nodes[0].(*ast.Ident).String()
-  args := node.Nodes[1:]
+  switch node.Nodes[0].(type) {
+  case *ast.Ident:
+    name := node.Nodes[0].(*ast.Ident).String()
+    args := node.Nodes[1:]
+    return ast.NewProc(name, args)
 
-  return ast.NewProc(name, args)
+  case *ast.Tuple:
+    // ((lambda (x) (+ x x)) 4)
+    t := node.Nodes[0].(*ast.Tuple)
+    if t.Nodes[0].Type() != const_.LAMBDA {
+      panic("unexpeced procedure?")
+    }
+    args := node.Nodes[1:]
+    for _, arg := range args {
+      if arg.Type() == const_.TUPLE {
+        panic("unexpeced args in lambda proc")
+      }
+    }
+    lambdaNode := parseLambda(t) // ast.Node
+    lambda := lambdaNode.(*ast.Lambda)
+    return ast.NewLambda(lambda.Formals, lambda.Body, args)
+
+  default:
+    panic("unexpeced procedure?")
+  }
+  return nil
 }
 
 func printType(node ast.Node) {

@@ -1,6 +1,8 @@
 package ast
 
 import (
+  //"fmt"
+
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   "github.com/ctliu3/gosp/procs"
@@ -26,19 +28,41 @@ func (self *Proc) Eval(env *scope.Scope) value.Value {
   if obj == nil {
     panic("undefined procedure")
   }
+
+  args := make([]value.Value, len(self.args))
+  for i := 0; i < len(self.args); i++ {
+    args[i] = self.args[i].Eval(env)
+  }
   switch obj.Type {
   case scope.Proc:
     proc := obj.Data.(procs.Proc)
-    args := make([]value.Value, len(self.args))
-    for i := 0; i < len(self.args); i++ {
-      args[i] = self.args[i].Eval(env)
-    }
-
     return proc.Call(args...)
   case scope.Var:
-    panic(self.name + " should be procedure")
+    switch obj.Data.(type) {
+    case *value.Closure:
+      return lambdaCall(obj.Data.(*value.Closure), args...)
+    default:
+      panic(self.name + " should be procedure")
+    }
   }
   return nil
+}
+
+func lambdaCall(closure *value.Closure, args ...value.Value) value.Value {
+  t := closure.Lambda.(*Lambda)
+  formals := t.Formals.(*Tuple)
+  body := t.Body.(Node)
+
+  nargs := len(formals.Nodes)
+  if nargs != len(args) {
+    panic("parameters not match")
+  }
+
+  env := scope.NewScope(nil)
+  for i := 0; i < nargs; i++ {
+    env.Insert(formals.Nodes[i].(*Ident).Name, scope.NewObj(args[i]))
+  }
+  return body.Eval(env)
 }
 
 func (self *Proc) String() string {

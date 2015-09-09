@@ -13,12 +13,13 @@ import (
 // (lambda (⟨formals⟩) ⟨body⟩)
 
 type Lambda struct {
-  formals Node
-  body Node
+  Formals Node
+  Body Node
+  Args []Node
 }
 
-func NewLambda(formals Node, body Node) *Lambda {
-  return &Lambda{formals, body}
+func NewLambda(formals Node, body Node, args []Node) *Lambda {
+  return &Lambda{formals, body, args}
 }
 
 func (self *Lambda) Type() string {
@@ -26,7 +27,7 @@ func (self *Lambda) Type() string {
 }
 
 func (self *Lambda) Eval(env *scope.Scope) value.Value {
-  return nil
+  return value.NewClosure(env, self)
 }
 
 func (self *Lambda) String() string {
