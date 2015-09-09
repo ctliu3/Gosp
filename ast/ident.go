@@ -7,7 +7,7 @@ import (
 )
 
 type Ident struct {
-  name string
+  Name string
 }
 
 func NewIdent(name string) *Ident {
@@ -15,11 +15,11 @@ func NewIdent(name string) *Ident {
 }
 
 func (self *Ident) Type() string {
-  return self.name
+  return self.Name
 }
 
 func (self *Ident) Eval(env *scope.Scope) value.Value {
-  if obj := env.Lookup(self.name, true); obj != nil {
+  if obj := env.Lookup(self.Name, true); obj != nil {
     if obj.Type == scope.Var {
       val := obj.Data.(value.Value)
       return val
@@ -31,5 +31,5 @@ func (self *Ident) Eval(env *scope.Scope) value.Value {
 }
 
 func (self *Ident) String() string {
-  return self.name
+  return self.Name
 }

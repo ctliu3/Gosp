@@ -15,6 +15,7 @@ const (
   FALSE = "#f"
   LAMBDA = "lambda"
   TUPLE = "tuple"
+  IDENT = "ident"
 
   CHAR = "char"
   STRING = "string"

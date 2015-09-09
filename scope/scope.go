@@ -34,7 +34,6 @@ func NewObj(data interface{}) *Object {
   return nil
 }
 
-
 func NewEmtpyScope(outer *Scope) *Scope {
   return &Scope{nil, make(map[string]*Object)}
 }

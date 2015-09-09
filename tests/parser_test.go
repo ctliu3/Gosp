@@ -6,15 +6,26 @@ import (
   "github.com/ctliu3/gosp/parser"
 )
 
-//func TestParser(t *testing.T) {
-  //expr := `(if (> a 4) (display yes) (display no)))`
-  //parser.ParseFromString(expr)
-//}
+func parse(exprs []string) {
+  for _, expr := range exprs {
+    nodes := parser.ParseFromString(expr)
+    for _, node := range nodes {
+      fmt.Println(node.Type())
+    }
+  }
+}
 
 func TestDefine(t *testing.T) {
-  expr := `(define b 1)`
-  nodes := parser.ParseFromString(expr)
-  for _, node := range nodes {
-    fmt.Println(node.Type())
+  exprs := []string {
+    `(define b 1)`,
+    `(define f (lambda (x y) (+ x y)))`,
   }
+  parse(exprs)
+}
+
+func TestLambda(t *testing.T) {
+  exprs := []string {
+    `((lambda (x) (+ x x)) 4)`,
+  }
+  parse(exprs)
 }

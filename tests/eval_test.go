@@ -59,3 +59,11 @@ func TestIf(t *testing.T) {
   }
   check(t, mp)
 }
+
+func TestLambda(t *testing.T) {
+  mp := map[string]string {
+    `(define f (lambda (x y) (+ x y))) (f 3 4)`: `7`,
+    //`((lambda (x) (+ x x)) 4)`,
+  }
+  check(t, mp)
+}

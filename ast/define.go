@@ -30,9 +30,6 @@ func (self *Define) Type() string {
 // This is a set manipulation.
 func (self *Define) Eval(env *scope.Scope) value.Value {
   fmt.Println("#Define.Eval()")
-  if self.expr.Type() == const_.LAMBDA {
-    fmt.Println("#0")
-  }
   var_ := self.var_.(*Ident)
   val := self.expr.Eval(env)
   env.Insert(var_.String(), scope.NewObj(val))

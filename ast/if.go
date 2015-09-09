@@ -24,6 +24,7 @@ func (self *If) Type() string {
 func (self *If) Eval(env *scope.Scope) value.Value {
   res := self.test.Eval(env)
   fmt.Println("-->" + res.String())
+  // TODO
   if res.String() != const_.FALSE {
     return self.conseq.Eval(env)
   } else {
