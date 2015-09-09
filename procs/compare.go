@@ -19,9 +19,9 @@ type compsType func(string, string) bool
 func (self *GT) Call(args ...value.Value) value.Value {
   operands, types := getOperands(args...)
 
-  compi := func(lhs int64, rhs int64) bool { return rhs > lhs }
-  compf := func(lhs float64, rhs float64) bool { return rhs > lhs }
-  comps := func(lhs string, rhs string) bool { return rhs > lhs }
+  compi := func(lhs int64, rhs int64) bool { return lhs > rhs }
+  compf := func(lhs float64, rhs float64) bool { return lhs > rhs }
+  comps := func(lhs string, rhs string) bool { return lhs > rhs }
 
   return check(operands, types, compi, compf, comps)
 }
@@ -35,15 +35,15 @@ func check(operands []interface{}, types []int, compi compiType, compf compfType
     }
     switch typ {
       case 0: // int
-      if compi(operands[i - 1].(int64), operands[i].(int64)) {
+      if !compi(operands[i - 1].(int64), operands[i].(int64)) {
         return value.NewBool(false)
       }
       case 1: // float
-      if compf(operands[i - 1].(float64), operands[i].(float64)) {
+      if !compf(operands[i - 1].(float64), operands[i].(float64)) {
         return value.NewBool(false)
       }
       case 2: // string
-      if comps(operands[i - 1].(string), operands[i].(string)) {
+      if !comps(operands[i - 1].(string), operands[i].(string)) {
         return value.NewBool(false)
       }
     }
