@@ -56,7 +56,7 @@ func (self *Scope) Insert(name string, obj *Object) (alt *Object) {
 }
 
 func (self *Scope) Lookup(name string, recur bool) *Object {
-  fmt.Println("#Lookup(), " + name)
+  fmt.Println("#Lookup, " + name)
   if !recur {
     return self.objects[name]
   }

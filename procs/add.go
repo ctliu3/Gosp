@@ -12,22 +12,22 @@ func NewAdd() *Add {
 }
 
 func (self *Add) Call(args ...value.Value) value.Value {
-  var res float64 = 0
+  var result float64 = 0
   isfloat := false
 
   for _, item := range args {
     switch item.(type) {
     case *value.Int:
-      res += float64(item.(*value.Int).Value)
+      result += float64(item.(*value.Int).Value)
     case *value.Float:
       isfloat = true
-      res += item.(*value.Float).Value
+      result += item.(*value.Float).Value
     default:
-      panic("unexpeced type for add function")
+      panic("expected: number?")
     }
   }
   if isfloat {
-    return value.NewFloat(res)
+    return value.NewFloat(result)
   }
-  return value.NewInt(int64(res))
+  return value.NewInt(int64(result))
 }

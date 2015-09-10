@@ -10,16 +10,15 @@ import (
 
 func Eval(expr string) string {
   nodes := parser.ParseFromString(expr)
-  fmt.Printf("#ast = %d\n", len(nodes))
+  fmt.Printf("#AST = %d\n", len(nodes))
 
   env := scope.NewScope(nil)
-  var res []string
+  var result []string
   for _, node := range nodes {
-    fmt.Println("#Eval(): " + node.Type())
     if val := node.Eval(env); val != nil {
-      res = append(res, val.String())
+      result = append(result, val.String())
     }
   }
 
-  return strings.Join(res, " ")
+  return strings.Join(result, " ")
 }

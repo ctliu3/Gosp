@@ -30,7 +30,7 @@ func NewInt(name string) *Int {
 
   val, err := strconv.ParseInt(name, base, 64)
   if err != nil {
-    panic("int parse error")
+    panic(err)
   }
 
   return &Int{value: val, base: base}

@@ -1,7 +1,7 @@
 package ast
 
 import (
-  //"fmt"
+  "fmt"
 
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
@@ -26,7 +26,8 @@ func (self *Proc) Eval(env *scope.Scope) value.Value {
   obj := env.Lookup(self.name, true)
 
   if obj == nil {
-    panic("undefined procedure")
+    panic(fmt.Errorf(
+      "%v: undefined;\n cannot reference undefined identifier", self.name))
   }
 
   args := make([]value.Value, len(self.args))
@@ -42,7 +43,7 @@ func (self *Proc) Eval(env *scope.Scope) value.Value {
     case *value.Closure:
       return lambdaCall(obj.Data.(*value.Closure), args...)
     default:
-      panic(self.name + " should be procedure")
+      panic(fmt.Errorf("%v should be identifier", self.name))
     }
   }
   return nil
@@ -55,7 +56,10 @@ func lambdaCall(closure *value.Closure, args ...value.Value) value.Value {
 
   nargs := len(formals.Nodes)
   if nargs != len(args) {
-    panic("parameters not match")
+    panic(fmt.Errorf(
+      `the expected number of arguments does not match the given number
+        expected: %v
+        given: %v`, len(formals.Nodes), nargs))
   }
 
   env := scope.NewScope(nil)
@@ -66,5 +70,5 @@ func lambdaCall(closure *value.Closure, args ...value.Value) value.Value {
 }
 
 func (self *Proc) String() string {
-  return self.name
+  return fmt.Sprintf("#<procedure:%v>", self.name)
 }

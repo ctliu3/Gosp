@@ -13,8 +13,8 @@ type Bool struct {
 }
 
 func NewBool(name string) *Bool {
-  if len(name) != 2 {
-    panic("bool parse error")
+  if len(name) != 2 || (name[1] != 't' && name[1] != 'f') {
+    panic(fmt.Errorf("bad syntax `%q", name))
   }
   if name[1] == 't' {
     return &Bool{value: true}
@@ -31,5 +31,5 @@ func (self *Bool) Eval(env *scope.Scope) value.Value {
 }
 
 func (self *Bool) String() string {
-  return fmt.Sprintf("%d", self.value)
+  return fmt.Sprintf("%v", self.value)
 }

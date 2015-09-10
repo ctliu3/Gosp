@@ -13,5 +13,5 @@ func NewInt(val int64) *Int {
 }
 
 func (self *Int) String() string {
-  return fmt.Sprintf("%d", self.Value)
+  return fmt.Sprintf("%v", self.Value)
 }

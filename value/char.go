@@ -13,5 +13,5 @@ func NewChar(val string) *Char {
 }
 
 func (self *Char) String() string {
-  return fmt.Sprintf("%q", self.Value)
+  return fmt.Sprintf("%v", self.Value)
 }

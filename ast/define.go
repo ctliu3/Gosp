@@ -29,7 +29,6 @@ func (self *Define) Type() string {
 
 // This is a set manipulation.
 func (self *Define) Eval(env *scope.Scope) value.Value {
-  fmt.Println("#Define.Eval()")
   var_ := self.var_.(*Ident)
   val := self.expr.Eval(env)
   env.Insert(var_.String(), scope.NewObj(val))
@@ -37,7 +36,3 @@ func (self *Define) Eval(env *scope.Scope) value.Value {
   // Define does not have return val.
   return nil
 }
-
-//func (self *Proc) String() string {
-  //return self.name
-//}

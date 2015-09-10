@@ -1,6 +1,7 @@
 package ast
 
 import (
+  "bytes"
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   const_ "github.com/ctliu3/gosp/constant"
@@ -24,5 +25,14 @@ func (self *Tuple) Eval(env *scope.Scope) value.Value {
 }
 
 func (self *Tuple) String() string {
-  return const_.TUPLE
+  var buffer bytes.Buffer
+
+  buffer.WriteString("#<tuple>\n\t")
+  for i, node := range self.Nodes {
+    if i > 0 {
+      buffer.WriteString(", ")
+    }
+    buffer.WriteString(node.Type())
+  }
+  return buffer.String()
 }

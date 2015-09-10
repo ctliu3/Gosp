@@ -31,5 +31,5 @@ func (self *Lambda) Eval(env *scope.Scope) value.Value {
 }
 
 func (self *Lambda) String() string {
-  return const_.LAMBDA
+  return "#<procedure>"
 }

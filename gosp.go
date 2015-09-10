@@ -10,10 +10,15 @@ import (
 
 const version = "0.1"
 
-func main() {
-  fmt.Printf("Welcome to Gosp v.%s\n", version)
-
+func run() {
   for {
+    defer func() {
+      if err := recover(); err != nil {
+        fmt.Printf("%v\n", err)
+      }
+      run()
+    }()
+
     fmt.Printf("> ")
     r := bufio.NewReader(os.Stdin)
     expr, _, err := r.ReadLine()
@@ -23,11 +28,11 @@ func main() {
     }
     res := Eval(string(expr))
     fmt.Println(res)
-
-    defer func() {
-      if err := recover(); err != nil {
-        fmt.Println("panic")
-      }
-    }()
   }
+}
+
+func main() {
+  fmt.Printf("Welcome to Gosp v.%s\n", version)
+
+  run()
 }

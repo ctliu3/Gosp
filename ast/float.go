@@ -16,7 +16,7 @@ type Float struct {
 func NewFloat(name string) *Float {
   val, err := strconv.ParseFloat(name, 0)
   if err != nil {
-    panic("float parse error")
+    panic(err)
   }
   return &Float{value: val}
 }
@@ -30,5 +30,5 @@ func (self *Float) Eval(env *scope.Scope) value.Value {
 }
 
 func (self *Float) String() string {
-  return fmt.Sprintf("%f", self.value)
+  return fmt.Sprintf("%v", self.value)
 }

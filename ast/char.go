@@ -1,6 +1,8 @@
 package ast
 
 import (
+  "fmt"
+
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   const_ "github.com/ctliu3/gosp/constant"
@@ -18,10 +20,10 @@ var chars = map[string]byte {
 
 func NewChar(name string) *Char {
   if len(name) > 3 {
-    if chr, ok := chars[name[3:]]; ok {
+    if chr, ok := chars[name[2:]]; ok {
       return &Char{value: name, chr: chr}
     } else {
-      panic("unexcepted char?")
+      panic(fmt.Errorf("bad character constant: %v", name))
     }
   }
   return &Char{value: name, chr: name[2]}

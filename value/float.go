@@ -13,5 +13,5 @@ func NewFloat(val float64) *Float {
 }
 
 func (self *Float) String() string {
-  return fmt.Sprintf("%d", self.Value)
+  return fmt.Sprintf("%v", self.Value)
 }

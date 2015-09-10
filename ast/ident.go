@@ -1,7 +1,8 @@
 package ast
 
 import (
-  //"fmt"
+  "fmt"
+
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
 )
@@ -31,5 +32,5 @@ func (self *Ident) Eval(env *scope.Scope) value.Value {
 }
 
 func (self *Ident) String() string {
-  return self.Name
+  return fmt.Sprintf("#<procedure:%v>", self.Name)
 }

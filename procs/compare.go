@@ -1,7 +1,6 @@
 package procs
 
 import (
-  //"fmt"
   "github.com/ctliu3/gosp/value"
 )
 
@@ -69,7 +68,7 @@ func getOperands(args ...value.Value) ([]interface{}, []int)  {
       operands[i] = item.(*value.String).Value
       types[i] = 2
     default:
-      panic("unexpeced type")
+      panic("unexpeced type?")
     }
   }
 

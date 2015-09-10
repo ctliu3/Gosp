@@ -13,5 +13,5 @@ func NewQuote(val string) *Quote {
 }
 
 func (self *Quote) String() string {
-  return fmt.Sprintf("%q", self.Value)
+  return fmt.Sprintf("%v", self.Value)
 }

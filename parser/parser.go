@@ -104,7 +104,6 @@ func parseDefine(node *ast.Tuple) ast.Node {
   if nNode != 3 {
     panic("unexpeced define expression")
   }
-  //formals := parseNode(node.Nodes[1])
   formals := node.Nodes[1]
   body := parseNode(node.Nodes[2])
 
