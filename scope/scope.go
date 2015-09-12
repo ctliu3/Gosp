@@ -45,14 +45,11 @@ func NewScope(outer *Scope) *Scope {
     ">": NewObj(procs.NewGT()),
   }
 
-  return &Scope{nil, objs}
+  return &Scope{outer, objs}
 }
 
-func (self *Scope) Insert(name string, obj *Object) (alt *Object) {
-  if alt = self.objects[name]; alt == nil {
-    self.objects[name] = obj
-  }
-  return nil
+func (self *Scope) Insert(name string, obj *Object) {
+  self.objects[name] = obj
 }
 
 func (self *Scope) Lookup(name string, recur bool) *Object {
@@ -68,4 +65,12 @@ func (self *Scope) Lookup(name string, recur bool) *Object {
     env = self.outer
   }
   return nil
+}
+
+func (self *Scope) Size() int {
+  size := len(self.objects)
+  if self.outer != nil {
+    size += self.outer.Size()
+  }
+  return size
 }

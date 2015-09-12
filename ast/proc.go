@@ -34,6 +34,9 @@ func (self *Proc) Eval(env *scope.Scope) value.Value {
   args := make([]value.Value, len(self.args))
   for i := 0; i < len(self.args); i++ {
     args[i] = self.args[i].Eval(env)
+    if args[i] == nil {
+      panic(fmt.Errorf("paramter %v can not be found", self.args[i].(*Ident).Name))
+    }
   }
   switch obj.Type {
   case scope.Proc:

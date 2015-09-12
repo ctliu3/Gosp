@@ -23,7 +23,7 @@ func (self *Add) Call(args ...value.Value) value.Value {
       isfloat = true
       result += item.(*value.Float).Value
     default:
-      panic("expected: number?")
+      panic("add proc: expected number?")
     }
   }
   if isfloat {
