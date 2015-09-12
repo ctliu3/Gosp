@@ -15,7 +15,7 @@ func parse(exprs []string) {
   }
 }
 
-func TestDefine(t *testing.T) {
+func TestParseDefine(t *testing.T) {
   exprs := []string {
     `(define b 1)`,
     `(define f (lambda (x y) (+ x y)))`,
@@ -23,9 +23,16 @@ func TestDefine(t *testing.T) {
   parse(exprs)
 }
 
-func TestLambda(t *testing.T) {
+func TestParseLambda(t *testing.T) {
   exprs := []string {
     `((lambda (x) (+ x x)) 4)`,
+  }
+  parse(exprs)
+}
+
+func TestParseLet(t *testing.T) {
+  exprs := []string {
+    `(let ((x 2) (y 3)) (+ x y))`,
   }
   parse(exprs)
 }

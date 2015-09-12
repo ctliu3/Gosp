@@ -2,7 +2,6 @@ package ast
 
 import (
   "fmt"
-
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   const_ "github.com/ctliu3/gosp/constant"
@@ -29,9 +28,10 @@ func (self *Define) Type() string {
 
 // This is a set manipulation.
 func (self *Define) Eval(env *scope.Scope) value.Value {
+  fmt.Println("Define#Eval")
   var_ := self.var_.(*Ident)
   val := self.expr.Eval(env)
-  env.Insert(var_.String(), scope.NewObj(val))
+  env.Insert(var_.Name, scope.NewObj(val))
 
   // Define does not have return val.
   return nil

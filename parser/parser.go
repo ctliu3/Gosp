@@ -79,7 +79,8 @@ func parseNode(node ast.Node) ast.Node {
   switch node.(type) {
   case *ast.Tuple:
     t := node.(*ast.Tuple)
-    fmt.Println(t.Nodes[0].Type())
+    fmt.Println("#parseNode#" + t.Nodes[0].Type())
+
     switch t.Nodes[0].Type() {
     case const_.DEFINE:
       return parseDefine(t)
@@ -87,6 +88,8 @@ func parseNode(node ast.Node) ast.Node {
       return parseLambda(t)
     case const_.IF:
       return parseIf(t)
+    case const_.LET:
+      return parseLet(t)
     default:
       return parseProc(t)
     }
@@ -98,9 +101,8 @@ func parseNode(node ast.Node) ast.Node {
 }
 
 func parseDefine(node *ast.Tuple) ast.Node {
-  fmt.Println("#parseDefine()")
+  fmt.Println("#parseDefine")
   nNode := len(node.Nodes)
-  fmt.Println(nNode)
   if nNode != 3 {
     panic("unexpeced define expression")
   }
@@ -111,7 +113,7 @@ func parseDefine(node *ast.Tuple) ast.Node {
 }
 
 func parseIf(node *ast.Tuple) ast.Node {
-  fmt.Println("#parseIf()")
+  fmt.Println("#parseIf")
   nNode := len(node.Nodes)
   if nNode != 4 {
     panic("unexpeced if expression")
@@ -123,8 +125,41 @@ func parseIf(node *ast.Tuple) ast.Node {
   return ast.NewIf(test, conseq, alt)
 }
 
+func parseLet(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseLet")
+  nNode := len(node.Nodes)
+  if nNode != 3 {
+    panic("let: bad syntax")
+  }
+  bindings := parseBinds(node.Nodes[1])
+  body := parseNode(node.Nodes[2])
+
+  return ast.NewLet(bindings, body)
+}
+
+func parseBinds(node ast.Node) ast.Binds {
+  if node.Type() != const_.TUPLE {
+    panic("let: bad syntax")
+  }
+
+  nodes := node.(*ast.Tuple).Nodes
+  binds := ast.NewBinds(nil)
+  for _, bind := range nodes {
+    if bind.Type() != const_.TUPLE {
+      panic("bad syntax")
+    }
+    t := bind.(*ast.Tuple)
+    if len(t.Nodes) != 2 && t.Nodes[0].Type() != const_.IDENT {
+      panic("bad syntax")
+    }
+    binds.Bindings = append(
+      binds.Bindings, *ast.NewBind(t.Nodes[0].(*ast.Ident).Name, parseNode(t.Nodes[1])))
+  }
+  return *binds
+}
+
 func parseLambda(node *ast.Tuple) ast.Node {
-  fmt.Println("#parseLambda()")
+  fmt.Println("#parseLambda")
   nNode := len(node.Nodes)
   if nNode != 3 {
     panic("unexpeced lambda procedure")
@@ -142,10 +177,10 @@ func parseIdent(node *ast.Node) ast.Node {
 }
 
 func parseProc(node *ast.Tuple) ast.Node {
-  fmt.Println("#parseProc()")
+  fmt.Println("#parseProc")
   switch node.Nodes[0].(type) {
   case *ast.Ident:
-    name := node.Nodes[0].(*ast.Ident).String()
+    name := node.Nodes[0].(*ast.Ident).Name
     args := node.Nodes[1:]
     return ast.NewProc(name, args)
 

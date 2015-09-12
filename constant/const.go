@@ -7,6 +7,9 @@ const (
   RVECT = "]"
 
   IF = "if"
+  LET = "let"
+  LET_START = "let*"
+  LETREC = "letrec"
   DEFINE ="define"
   BEGIN = "begin"
   UNLESS = "unless"
@@ -16,6 +19,8 @@ const (
   LAMBDA = "lambda"
   TUPLE = "tuple"
   IDENT = "ident"
+  BIND = "bind"
+  BINDS = "binds"
 
   CHAR = "char"
   STRING = "string"

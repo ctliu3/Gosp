@@ -67,3 +67,11 @@ func TestLambda(t *testing.T) {
   }
   check(t, mp)
 }
+
+func TestLet(t *testing.T) {
+  mp := map[string]string {
+    `(let ((x 2) (y 3)) (+ x y))`: `5`,
+    `(let ((x (+ 1 2)) (y 3)) (+ x y))`: `6`,
+  }
+  check(t, mp)
+}

@@ -23,6 +23,7 @@ func (self *Proc) Type() string {
 }
 
 func (self *Proc) Eval(env *scope.Scope) value.Value {
+  fmt.Println("Proc#Eval")
   obj := env.Lookup(self.name, true)
 
   if obj == nil {
