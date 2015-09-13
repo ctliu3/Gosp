@@ -8,7 +8,7 @@ const (
 
   IF = "if"
   LET = "let"
-  LET_START = "let*"
+  LET_STAR = "let*"
   LETREC = "letrec"
   DEFINE ="define"
   BEGIN = "begin"

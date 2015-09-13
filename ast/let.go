@@ -24,7 +24,7 @@ func (self *Let) Type() string {
 func (self *Let) Eval(env *scope.Scope) value.Value {
   local := scope.NewScope(env)
   for _, bind := range self.bindings.Bindings {
-    local.Insert(bind.var_, scope.NewObj(bind.init.Eval(local)))
+    local.Insert(bind.var_, scope.NewObj(bind.init.Eval(env)))
   }
   return self.body.Eval(local)
 }

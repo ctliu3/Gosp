@@ -76,3 +76,10 @@ func TestLet(t *testing.T) {
   }
   check(t, mp)
 }
+
+func TestLetStar(t *testing.T) {
+  mp := map[string]string {
+    `(let ((x 2) (y 3)) (let* ((x 7) (z (+ x y))) (- z x)))`: `3`,
+  }
+  check(t, mp)
+}

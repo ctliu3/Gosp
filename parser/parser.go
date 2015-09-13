@@ -88,8 +88,8 @@ func parseNode(node ast.Node) ast.Node {
       return parseLambda(t)
     case const_.IF:
       return parseIf(t)
-    case const_.LET:
-      return parseLet(t)
+    case const_.LET, const_.LET_STAR:
+      return parseLets(t)
     default:
       return parseProc(t)
     }
@@ -125,7 +125,7 @@ func parseIf(node *ast.Tuple) ast.Node {
   return ast.NewIf(test, conseq, alt)
 }
 
-func parseLet(node *ast.Tuple) ast.Node {
+func parseLets(node *ast.Tuple) ast.Node {
   fmt.Println("#parseLet")
   nNode := len(node.Nodes)
   if nNode != 3 {
@@ -134,7 +134,15 @@ func parseLet(node *ast.Tuple) ast.Node {
   bindings := parseBinds(node.Nodes[1])
   body := parseNode(node.Nodes[2])
 
-  return ast.NewLet(bindings, body)
+  switch node.Nodes[0].Type() {
+  case const_.LET:
+    return ast.NewLet(bindings, body)
+  case const_.LET_STAR:
+    return ast.NewLetStar(bindings, body)
+  default:
+    panic("unexpeced let expression?")
+  }
+  return nil
 }
 
 func parseBinds(node ast.Node) ast.Binds {
