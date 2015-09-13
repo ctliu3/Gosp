@@ -1,9 +1,5 @@
 package value
 
-import (
-  "fmt"
-)
-
 type Bool struct {
   Value bool
 }
@@ -13,5 +9,8 @@ func NewBool(val bool) *Bool {
 }
 
 func (self *Bool) String() string {
-  return fmt.Sprintf("%v", self.Value)
+  if self.Value {
+    return "#t"
+  }
+  return "#f"
 }
