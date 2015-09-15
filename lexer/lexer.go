@@ -335,7 +335,7 @@ func scanNumber(l *Lexer) bool {
 }
 
 func isSpace(r rune) bool {
-  return r == ' ' || r == '\t';
+  return r == ' ' || r == '\t' || r == '\n';
 }
 
 func isAlphaNumeric(r rune) bool {
