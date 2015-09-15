@@ -1,7 +1,7 @@
 package ast
 
 import (
-  //"fmt"
+  "fmt"
   //"strconv"
   //"strings"
 
@@ -27,6 +27,7 @@ func (self *Lambda) Type() string {
 }
 
 func (self *Lambda) Eval(env *scope.Scope) value.Value {
+  fmt.Println("#Lambda#Eval")
   return value.NewClosure(env, self)
 }
 

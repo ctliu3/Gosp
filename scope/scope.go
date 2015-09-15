@@ -39,6 +39,10 @@ func NewEmtpyScope(outer *Scope) *Scope {
 }
 
 func NewScope(outer *Scope) *Scope {
+  if outer != nil {
+    return &Scope{outer, make(map[string]*Object)}
+  }
+
   objs := map[string]*Object {
     "+": NewObj(procs.NewAdd()),
     "-": NewObj(procs.NewSub()),
@@ -48,8 +52,7 @@ func NewScope(outer *Scope) *Scope {
     ">=": NewObj(procs.NewGE()),
     "==": NewObj(procs.NewEQ()),
   }
-
-  return &Scope{outer, objs}
+  return &Scope{nil, objs}
 }
 
 func (self *Scope) Insert(name string, obj *Object) {
@@ -66,7 +69,7 @@ func (self *Scope) Lookup(name string, recur bool) *Object {
     if alt := env.objects[name]; alt != nil {
       return alt
     }
-    env = self.outer
+    env = env.outer
   }
   return nil
 }
@@ -77,4 +80,16 @@ func (self *Scope) Size() int {
     size += self.outer.Size()
   }
   return size
+}
+
+func (self *Scope) DisplayDefine() {
+  if self == nil {
+    return
+  }
+
+  self.outer.DisplayDefine()
+  for key := range self.objects {
+    fmt.Printf("%v, ", key)
+  }
+  fmt.Println()
 }

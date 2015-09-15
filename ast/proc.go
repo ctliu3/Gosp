@@ -34,10 +34,13 @@ func (self *Proc) Eval(env *scope.Scope) value.Value {
   args := make([]value.Value, len(self.args))
   for i := 0; i < len(self.args); i++ {
     args[i] = self.args[i].Eval(env)
+    fmt.Printf("args, i %v type %v string %v\n", i, self.args[i].Type(), args[i].String())
     if args[i] == nil {
-      panic(fmt.Errorf("paramter %v can not be found", self.args[i].(*Ident).Name))
+      panic(fmt.Errorf("parameter %v can not be found", self.args[i].(*Ident).Name))
     }
   }
+
+  fmt.Printf("proc type %v\n", obj.Type)
   switch obj.Type {
   case scope.Proc:
     proc := obj.Data.(procs.Proc)
@@ -55,6 +58,7 @@ func (self *Proc) Eval(env *scope.Scope) value.Value {
 
 func lambdaCall(closure *value.Closure, args ...value.Value) value.Value {
   t := closure.Lambda.(*Lambda)
+  env := closure.Env.(*scope.Scope)
   formals := t.Formals.(*Tuple)
   body := t.Body.(Node)
 
@@ -66,7 +70,6 @@ func lambdaCall(closure *value.Closure, args ...value.Value) value.Value {
         given: %v`, len(formals.Nodes), nargs))
   }
 
-  env := scope.NewScope(nil)
   for i := 0; i < nargs; i++ {
     env.Insert(formals.Nodes[i].(*Ident).Name, scope.NewObj(args[i]))
   }
