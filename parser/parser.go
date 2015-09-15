@@ -88,8 +88,10 @@ func parseNode(node ast.Node) ast.Node {
       return parseLambda(t)
     case const_.IF:
       return parseIf(t)
-    case const_.LET, const_.LET_STAR:
+    case const_.LET, const_.LET_STAR, const_.LETREC:
       return parseLets(t)
+    case const_.IMPORT:
+      return parseImport(t)
     default:
       return parseProc(t)
     }
@@ -106,6 +108,8 @@ func parseDefine(node *ast.Tuple) ast.Node {
   if nNode != 3 {
     panic("unexpeced define expression")
   }
+  // TODO
+  // (define (f x y) (+ x y))
   formals := node.Nodes[1]
   body := parseNode(node.Nodes[2])
 
@@ -131,6 +135,7 @@ func parseLets(node *ast.Tuple) ast.Node {
   if nNode != 3 {
     panic("let: bad syntax")
   }
+  fmt.Println("#111")
   bindings := parseBinds(node.Nodes[1])
   body := parseNode(node.Nodes[2])
 
@@ -139,6 +144,8 @@ func parseLets(node *ast.Tuple) ast.Node {
     return ast.NewLet(bindings, body)
   case const_.LET_STAR:
     return ast.NewLetStar(bindings, body)
+  case const_.LETREC:
+    return ast.NewLetrec(bindings, body)
   default:
     panic("unexpeced let expression?")
   }
@@ -166,6 +173,16 @@ func parseBinds(node ast.Node) ast.Binds {
   return *binds
 }
 
+func parseImport(node *ast.Tuple) ast.Node {
+  // (import "lib.gosp")
+
+  if len(node.Nodes) != 2 {
+    panic("import: bad syntax")
+  }
+  filename := node.Nodes[1].(*ast.Ident).Name
+  return ast.NewImport(filename)
+}
+
 func parseLambda(node *ast.Tuple) ast.Node {
   fmt.Println("#parseLambda")
   nNode := len(node.Nodes)
@@ -180,8 +197,7 @@ func parseLambda(node *ast.Tuple) ast.Node {
 }
 
 func parseIdent(node *ast.Node) ast.Node {
-  return nil
-  //return (*node).(*ast.Ident)
+  return *node;
 }
 
 func parseProc(node *ast.Tuple) ast.Node {
@@ -189,14 +205,17 @@ func parseProc(node *ast.Tuple) ast.Node {
   switch node.Nodes[0].(type) {
   case *ast.Ident:
     name := node.Nodes[0].(*ast.Ident).Name
-    args := node.Nodes[1:]
+    args := make([]ast.Node, len(node.Nodes) - 1)
+    for i, _ := range args {
+      args[i] = parseNode(node.Nodes[i + 1])
+    }
     return ast.NewProc(name, args)
 
   case *ast.Tuple:
     // ((lambda (x) (+ x x)) 4)
     t := node.Nodes[0].(*ast.Tuple)
     if t.Nodes[0].Type() != const_.LAMBDA {
-      panic("unexpeced procedure?")
+      panic(fmt.Errorf("unexpeced procedure: %v", t.Nodes[0].Type()))
     }
     args := node.Nodes[1:]
     for _, arg := range args {

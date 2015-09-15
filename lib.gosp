@@ -1,0 +1,13 @@
+(define PI 3.1415926)
+
+(define zero?
+  (lambda (n)
+    (if (== n 0) #t #f)))
+
+(define positive?
+  (lambda (n)
+    (if (> n 0) #t #f)))
+
+(define negative?
+  (lambda (n)
+    (if (< n 0) #t #f)))
