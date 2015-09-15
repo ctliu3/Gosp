@@ -1,29 +1,13 @@
 package procs
 
 import (
+  "fmt"
   "github.com/ctliu3/gosp/value"
 )
-
-type GT struct {
-}
-
-func NewGT() *GT {
-  return &GT{}
-}
 
 type compiType func(int64, int64) bool
 type compfType func(float64, float64) bool
 type compsType func(string, string) bool
-
-func (self *GT) Call(args ...value.Value) value.Value {
-  operands, types := getOperands(args...)
-
-  compi := func(lhs int64, rhs int64) bool { return lhs > rhs }
-  compf := func(lhs float64, rhs float64) bool { return lhs > rhs }
-  comps := func(lhs string, rhs string) bool { return lhs > rhs }
-
-  return check(operands, types, compi, compf, comps)
-}
 
 func check(operands []interface{}, types []int, compi compiType, compf compfType, comps compsType) value.Value {
   typ := types[0]
@@ -72,11 +56,9 @@ func getOperands(args ...value.Value) ([]interface{}, []int)  {
     }
   }
 
-  if types[0] == 2 {
-    for _, typ := range types {
-      if typ != types[0] {
-        panic("type not match")
-      }
+  for _, typ := range types {
+    if typ != types[0] {
+      panic(fmt.Errorf("type not match: %v", args[0].String()))
     }
   }
 
