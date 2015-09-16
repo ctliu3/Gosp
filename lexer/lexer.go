@@ -86,7 +86,6 @@ func (self *Lexer) run() {
 }
 
 func (self *Lexer) emit(typ TokenType) {
-  //fmt.Printf("%q, ", self.expr[self.start:self.pos])
   self.tokenChan <- Token{typ, self.expr[self.start:self.pos]}
   self.start = self.pos
 }
@@ -257,9 +256,21 @@ Loop:
 }
 
 func lexQuote(l *Lexer) StateFn {
-  for r := l.next(); isAlphaNumeric(r); r = l.next() {
+  lparen := 0
+  l.ignore()
+  for r := l.next(); isAlphaNumeric(r) || isChar(r) || strings.ContainsRune(`"'#`, r); r = l.next() {
+    if r == '(' {
+      lparen++
+    } else if r == ')' {
+      lparen--
+      if lparen == 0 {
+        break
+      }
+    }
   }
-  l.backward()
+  if lparen != 0 {
+    panic("unexcepted quote?")
+  }
   l.emit(TokenQuote)
   return lexWhitespace
 }

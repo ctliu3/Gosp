@@ -6,12 +6,16 @@ import (
   const_ "github.com/ctliu3/gosp/constant"
 )
 
+// (quote ⟨datum⟩)
+// ’⟨datum⟩
+// ⟨constant⟩
+
 type Quote struct {
-  value string
+  datum string
 }
 
-func NewQuote(name string) *Quote {
-  return &Quote{value: name}
+func NewQuote(datum string) *Quote {
+  return &Quote{datum}
 }
 
 func (self *Quote) Type() string {
@@ -19,9 +23,17 @@ func (self *Quote) Type() string {
 }
 
 func (self *Quote) Eval(env *scope.Scope) value.Value {
-  return value.NewQuote(self.value)
+  if len(self.datum) > 0 && self.datum[0] == '\'' {
+    quote := NewQuote(self.datum[1:])
+    return value.NewQuote("(quote " + quote.Eval(env).String() +  ")")
+  }
+  return value.NewQuote(self.datum)
 }
 
 func (self *Quote) String() string {
-  return self.value
+  return self.datum
+}
+
+func (self *Quote) ExtRep() string {
+  return ""
 }
