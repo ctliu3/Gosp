@@ -257,12 +257,16 @@ Loop:
 
 func lexQuote(l *Lexer) StateFn {
   lparen := 0
+  flag := false
   l.ignore()
   for r := l.next(); isAlphaNumeric(r) || isChar(r) || strings.ContainsRune(`"'#`, r); r = l.next() {
     if r == '(' {
+      flag = true
       lparen++
     } else if r == ')' {
-      lparen--
+      if lparen > 0 {
+        lparen--
+      }
       if lparen == 0 {
         break
       }
@@ -270,6 +274,9 @@ func lexQuote(l *Lexer) StateFn {
   }
   if lparen != 0 {
     panic("unexcepted quote?")
+  }
+  if !flag {
+    l.backward()
   }
   l.emit(TokenQuote)
   return lexWhitespace

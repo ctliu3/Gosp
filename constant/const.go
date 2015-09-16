@@ -13,6 +13,8 @@ const (
   DEFINE = "define"
   IMPORT = "import"
   BEGIN = "begin"
+  COND = "cond"
+  ELSE = "else"
   UNLESS = "unless"
   WHEN = "when"
   TRUE = "#t"
@@ -22,6 +24,9 @@ const (
   IDENT = "ident"
   BIND = "bind"
   BINDS = "binds"
+  SET = "set!"
+  DISPLAY = "display"
+  QUOTE = "quote"
 
   CHAR = "char"
   STRING = "string"
@@ -29,5 +34,4 @@ const (
   FLOAT = "float"
   PROC = "proc"
   BOOL = "bool"
-  QUOTE = "quote"
 )

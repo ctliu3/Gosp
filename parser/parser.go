@@ -84,6 +84,16 @@ func parseNode(node ast.Node) ast.Node {
     switch t.Nodes[0].Type() {
     case const_.DEFINE:
       return parseDefine(t)
+    case const_.SET:
+      return parseSet(t)
+    case const_.DISPLAY:
+      return parseDisplay(t)
+    case const_.BEGIN:
+      return parseBegin(t)
+    case const_.COND:
+      return parseCond(t)
+    case const_.QUOTE:
+      return parseQuote(t)
     case const_.LAMBDA:
       return parseLambda(t)
     case const_.IF:
@@ -116,6 +126,69 @@ func parseDefine(node *ast.Tuple) ast.Node {
   return ast.NewDefine(formals, body)
 }
 
+func parseSet(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseSet")
+  nNode := len(node.Nodes)
+  if nNode != 3 {
+    panic("unexpeced define expression")
+  }
+  formals := node.Nodes[1]
+  body := parseNode(node.Nodes[2])
+
+  return ast.NewSet(formals, body)
+}
+
+func parseDisplay(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseDisplay")
+  nNode := len(node.Nodes)
+  if nNode != 2 {
+    panic("unexpeced display expression")
+  }
+  obj := parseNode(node.Nodes[1])
+
+  return ast.NewDisplay(obj)
+}
+
+func parseBegin(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseBegin")
+  nNode := len(node.Nodes)
+  if nNode < 2 {
+    panic("unexpeced begin expression")
+  }
+  exprs := make([]ast.Node, len(node.Nodes) - 1)
+  for i, _ := range exprs {
+    exprs[i] = parseNode(node.Nodes[i + 1])
+  }
+
+  return ast.NewBegin(exprs)
+}
+
+func parseCond(node *ast.Tuple) ast.Node {
+  var clause []ast.Tuple
+  for _, node := range node.Nodes[1:] {
+    if node.Type() != const_.TUPLE || len(node.(*ast.Tuple).Nodes) != 2 {
+      panic("cond: bad syntax")
+    }
+    var t ast.Tuple
+    for _, item := range node.(*ast.Tuple).Nodes {
+      t.Nodes = append(t.Nodes, parseNode(item))
+    }
+    clause = append(clause, t)
+  }
+  return ast.NewCond(clause)
+}
+
+func parseQuote(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseQuote")
+  nNode := len(node.Nodes)
+  if nNode != 2 {
+    panic("unexpeced quote expression")
+  }
+  datum := node.Nodes[1].ExtRep()
+
+  return ast.NewQuote(datum)
+}
+
 func parseIf(node *ast.Tuple) ast.Node {
   fmt.Println("#parseIf")
   nNode := len(node.Nodes)
@@ -135,7 +208,6 @@ func parseLets(node *ast.Tuple) ast.Node {
   if nNode != 3 {
     panic("let: bad syntax")
   }
-  fmt.Println("#111")
   bindings := parseBinds(node.Nodes[1])
   body := parseNode(node.Nodes[2])
 
@@ -241,8 +313,8 @@ func printType(node ast.Node) {
     for _, node := range t.Nodes {
       printType(node)
     }
-    fmt.Printf(")")
+    fmt.Printf(") ")
   default:
-    fmt.Printf("%q ", node.Type())
+    fmt.Printf("%v ", node.Type())
   }
 }
