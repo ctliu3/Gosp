@@ -57,3 +57,7 @@ func (self *Int) String() string {
   }
   return "error while handling String() of Int"
 }
+
+func (self *Int) ExtRep() string {
+  return self.String()
+}

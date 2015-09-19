@@ -15,11 +15,10 @@ import (
 type Lambda struct {
   Formals Node
   Body Node
-  Args []Node
 }
 
-func NewLambda(formals Node, body Node, args []Node) *Lambda {
-  return &Lambda{formals, body, args}
+func NewLambda(formals Node, body Node) *Lambda {
+  return &Lambda{formals, body}
 }
 
 func (self *Lambda) Type() string {
@@ -33,4 +32,8 @@ func (self *Lambda) Eval(env *scope.Scope) value.Value {
 
 func (self *Lambda) String() string {
   return "#<procedure>"
+}
+
+func (self *Lambda) ExtRep() string {
+  return ""
 }

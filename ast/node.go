@@ -8,4 +8,5 @@ import (
 type Node interface {
   Type() string
   Eval(env *scope.Scope) value.Value
+  ExtRep() string
 }

@@ -34,3 +34,7 @@ func (self *Ident) Eval(env *scope.Scope) value.Value {
 func (self *Ident) String() string {
   return fmt.Sprintf("#<procedure:%v>", self.Name)
 }
+
+func (self *Ident) ExtRep() string {
+  return self.Name
+}

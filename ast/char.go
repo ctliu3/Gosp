@@ -40,3 +40,7 @@ func (self *Char) Eval(env *scope.Scope) value.Value {
 func (self *Char) String() string {
   return self.value
 }
+
+func (self *Char) ExtRep() string {
+  return self.value
+}

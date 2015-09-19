@@ -19,7 +19,7 @@ type Parser struct {
 func ParseFromString(expr string) []ast.Node {
   parser := &Parser{lexer.Lex("gosp", expr)}
   tuples := make([]ast.Node, 0)
-  parser.parse(&tuples, 0)
+  parser.parse(&tuples, 0, -1)
 
   // For debugging.
   for _, node := range tuples {
@@ -27,44 +27,64 @@ func ParseFromString(expr string) []ast.Node {
     fmt.Println()
   }
 
-  return parseList(&tuples)
+  return parseNodes(tuples)
 }
 
-func (self *Parser) parse(nodes *[]ast.Node, dep int) {
+func (self *Parser) parse(nodes *[]ast.Node, dep int, typ lexer.TokenType) {
   for token := self.l.NextToken(); token.Type != lexer.TokenEOF; token = self.l.NextToken() {
 
+    var node ast.Node
     switch token.Type {
     case lexer.TokenBool:
-      *nodes = append(*nodes, ast.NewBool(token.Name))
+      node = ast.NewBool(token.Name)
+
     case lexer.TokenChar:
-      *nodes = append(*nodes, ast.NewChar(token.Name))
+      node = ast.NewChar(token.Name)
+
     case lexer.TokenString:
-      *nodes = append(*nodes, ast.NewString(token.Name))
+      node = ast.NewString(token.Name)
+
     case lexer.TokenQuote:
-      *nodes = append(*nodes, ast.NewQuote(token.Name))
+      quoteExpr := []ast.Node{ast.NewIdent("quote")}
+      self.parse(&quoteExpr, dep + 1, lexer.TokenQuote)
+      node = ast.NewTuple(quoteExpr)
+
+    case lexer.TokenQuasiQuote:
+      qqExpr := []ast.Node{ast.NewIdent("quasiquote")}
+      self.parse(&qqExpr, dep + 1, lexer.TokenQuasiQuote)
+      node = ast.NewTuple(qqExpr)
+
     case lexer.TokenIdent:
-      *nodes = append(*nodes, ast.NewIdent(token.Name))
+      node = ast.NewIdent(token.Name)
+
     case lexer.TokenNumber:
       if strings.ContainsAny(token.Name, "Ee.") {
-        *nodes = append(*nodes, ast.NewFloat(token.Name))
+        node = ast.NewFloat(token.Name)
       } else {
-        *nodes = append(*nodes, ast.NewInt(token.Name))
+        node = ast.NewInt(token.Name)
       }
+
     case lexer.TokenLParen:
       sub := make([]ast.Node, 0)
-      self.parse(&sub, dep + 1)
-      *nodes = append(*nodes, ast.NewTuple(sub))
+      self.parse(&sub, dep + 1, -1)
+      node = ast.NewTuple(sub)
+
     case lexer.TokenRParen:
       return
+
     default:
       panic("unexpeced token")
+    }
+    *nodes = append(*nodes, node)
+    if typ == lexer.TokenQuote {
+      break
     }
   }
 }
 
-func parseList(tuples *[]ast.Node) []ast.Node {
+func parseNodes(tuples []ast.Node) []ast.Node {
   var nodes []ast.Node
-  for _, tuple := range *tuples {
+  for _, tuple := range tuples {
     nodes = append(nodes, parseNode(tuple))
   }
   return nodes
@@ -76,11 +96,16 @@ func parseList(tuples *[]ast.Node) []ast.Node {
 // 2. Var or ..
 func parseNode(node ast.Node) ast.Node {
   fmt.Println("#parseNode")
+
   switch node.(type) {
   case *ast.Tuple:
     t := node.(*ast.Tuple)
-    fmt.Println("#parseNode#" + t.Nodes[0].Type())
 
+    if len(t.Nodes) == 0 {
+      return parseList(t)
+    }
+
+    fmt.Println("#parseNode#" + t.Nodes[0].Type())
     switch t.Nodes[0].Type() {
     case const_.DEFINE:
       return parseDefine(t)
@@ -102,6 +127,8 @@ func parseNode(node ast.Node) ast.Node {
       return parseLets(t)
     case const_.IMPORT:
       return parseImport(t)
+    case const_.LIST:
+      return parseList(t)
     default:
       return parseProc(t)
     }
@@ -118,12 +145,30 @@ func parseDefine(node *ast.Tuple) ast.Node {
   if nNode != 3 {
     panic("unexpeced define expression")
   }
-  // TODO
-  // (define (f x y) (+ x y))
-  formals := node.Nodes[1]
-  body := parseNode(node.Nodes[2])
+  // implicit lambda expressions, e.g., (define (add x y) (+ x y))
+  var vars ast.Node
+  var expr ast.Node
 
-  return ast.NewDefine(formals, body)
+  if node.Nodes[1].Type() == const_.TUPLE {
+    t := node.Nodes[1].(*ast.Tuple)
+    vars = t.Nodes[0]
+
+    var args []ast.Node
+    for _, node := range t.Nodes[1:] {
+      args = append(args, node)
+    }
+
+    body := parseNode(node.Nodes[2])
+    expr = ast.NewLambda(ast.NewTuple(args), body)
+  } else {
+
+    // 1. normal definition, e.g. (defien a 1)
+    // 2. explicit lambda expressions, e.g. (define inc (lambda (x) (+ x 1)))
+    vars = node.Nodes[1]
+    expr = parseNode(node.Nodes[2])
+  }
+
+  return ast.NewDefine(vars, expr)
 }
 
 func parseSet(node *ast.Tuple) ast.Node {
@@ -136,6 +181,22 @@ func parseSet(node *ast.Tuple) ast.Node {
   body := parseNode(node.Nodes[2])
 
   return ast.NewSet(formals, body)
+}
+
+func parseList(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseList")
+  nNode := len(node.Nodes)
+  if nNode == 0 {
+    return ast.NewList(make([]ast.Node, 0))
+  }
+  var nodes []ast.Node
+  for _, node := range node.Nodes[1:] {
+    nodes = append(nodes, parseNode(node))
+    //if i > 0 && nodes[i].Type() != nodes[0].Type() {
+      //panic("list: type not match")
+    //}
+  }
+  return ast.NewList(nodes)
 }
 
 func parseDisplay(node *ast.Tuple) ast.Node {
@@ -166,6 +227,7 @@ func parseBegin(node *ast.Tuple) ast.Node {
 func parseCond(node *ast.Tuple) ast.Node {
   var clause []ast.Tuple
   for _, node := range node.Nodes[1:] {
+    fmt.Printf("len = %v\n", len(node.(*ast.Tuple).Nodes))
     if node.Type() != const_.TUPLE || len(node.(*ast.Tuple).Nodes) != 2 {
       panic("cond: bad syntax")
     }
@@ -179,12 +241,12 @@ func parseCond(node *ast.Tuple) ast.Node {
 }
 
 func parseQuote(node *ast.Tuple) ast.Node {
-  fmt.Println("#parseQuote")
+  fmt.Printf("#parseQuote, %v\n", len(node.Nodes))
   nNode := len(node.Nodes)
-  if nNode != 2 {
+  if nNode < 2 {
     panic("unexpeced quote expression")
   }
-  datum := node.Nodes[1].ExtRep()
+  datum := parseNode(node.Nodes[1])
 
   return ast.NewQuote(datum)
 }
@@ -205,11 +267,11 @@ func parseIf(node *ast.Tuple) ast.Node {
 func parseLets(node *ast.Tuple) ast.Node {
   fmt.Println("#parseLet")
   nNode := len(node.Nodes)
-  if nNode != 3 {
+  if nNode < 3 {
     panic("let: bad syntax")
   }
   bindings := parseBinds(node.Nodes[1])
-  body := parseNode(node.Nodes[2])
+  body := parseNodes(node.Nodes[2:])
 
   switch node.Nodes[0].Type() {
   case const_.LET:
@@ -265,7 +327,7 @@ func parseLambda(node *ast.Tuple) ast.Node {
   formals := node.Nodes[1]
   body := parseNode(node.Nodes[2])
 
-  return ast.NewLambda(formals, body, nil)
+  return ast.NewLambda(formals, body)
 }
 
 func parseIdent(node *ast.Node) ast.Node {
@@ -276,6 +338,7 @@ func parseProc(node *ast.Tuple) ast.Node {
   fmt.Println("#parseProc")
   switch node.Nodes[0].(type) {
   case *ast.Ident:
+    // (f x y)
     name := node.Nodes[0].(*ast.Ident).Name
     args := make([]ast.Node, len(node.Nodes) - 1)
     for i, _ := range args {
@@ -297,7 +360,8 @@ func parseProc(node *ast.Tuple) ast.Node {
     }
     lambdaNode := parseLambda(t) // ast.Node
     lambda := lambdaNode.(*ast.Lambda)
-    return ast.NewLambda(lambda.Formals, lambda.Body, args)
+    return ast.NewInvoke(lambda, args)
+    //return ast.NewLambda(lambda.Formals, lambda.Body, args)
 
   default:
     panic("unexpeced procedure?")

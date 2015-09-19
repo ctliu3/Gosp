@@ -11,10 +11,10 @@ import (
 
 type LetStar struct {
   bindings Binds
-  body Node
+  body []Node
 }
 
-func NewLetStar(bindings Binds, body Node) *LetStar {
+func NewLetStar(bindings Binds, body []Node) *LetStar {
   return &LetStar{bindings, body}
 }
 
@@ -28,9 +28,18 @@ func (self *LetStar) Eval(env *scope.Scope) value.Value {
   for _, bind := range self.bindings.Bindings {
     local.Insert(bind.var_, scope.NewObj(bind.init.Eval(local)))
   }
-  return self.body.Eval(local)
+
+  var ret value.Value
+  for _, node := range self.body {
+    ret = node.Eval(local)
+  }
+  return ret
 }
 
 func (self *LetStar) String() string {
   return "let*"
+}
+
+func (self *LetStar) ExtRep() string {
+  return ""
 }

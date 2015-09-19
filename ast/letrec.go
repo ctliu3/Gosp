@@ -10,10 +10,10 @@ import (
 
 type Letrec struct {
   bindings Binds
-  body Node
+  body []Node
 }
 
-func NewLetrec(bindings Binds, body Node) *Letrec {
+func NewLetrec(bindings Binds, body []Node) *Letrec {
   return &Letrec{bindings, body}
 }
 
@@ -34,9 +34,17 @@ func (self *Letrec) Eval(env *scope.Scope) value.Value {
     local.Insert(bind.var_, scope.NewObj(bind.init.Eval(local)))
   }
 
-  return self.body.Eval(local)
+  var ret value.Value
+  for _, node := range self.body {
+    ret = node.Eval(local)
+  }
+  return ret
 }
 
 func (self *Letrec) String() string {
   return "letrec"
+}
+
+func (self *Letrec) ExtRep() string {
+  return ""
 }

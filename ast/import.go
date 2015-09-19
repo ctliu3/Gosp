@@ -39,3 +39,7 @@ func (self *Import) Eval(env *scope.Scope) value.Value {
   //fmt.Println(string(buffer))
   return NewString(string(buffer))
 }
+
+func (self* Import) ExtRep() string {
+  return ""
+}

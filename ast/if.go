@@ -33,3 +33,7 @@ func (self *If) Eval(env *scope.Scope) value.Value {
 func (self *If) String() string {
   return "if"
 }
+
+func (self *If) ExtRep() string {
+  return ""
+}

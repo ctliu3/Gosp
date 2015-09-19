@@ -1,6 +1,7 @@
 package ast
 
 import (
+  "fmt"
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   const_ "github.com/ctliu3/gosp/constant"
@@ -24,4 +25,8 @@ func (self *String) Eval(env *scope.Scope) value.Value {
 
 func (self *String) String() string {
   return self.value
+}
+
+func (self *String) ExtRep() string {
+  return fmt.Sprintf("%v", self.value)
 }

@@ -1,6 +1,7 @@
 package ast
 
 import (
+  "fmt"
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   const_ "github.com/ctliu3/gosp/constant"
@@ -11,10 +12,10 @@ import (
 // ⟨constant⟩
 
 type Quote struct {
-  datum string
+  datum Node
 }
 
-func NewQuote(datum string) *Quote {
+func NewQuote(datum Node) *Quote {
   return &Quote{datum}
 }
 
@@ -23,17 +24,19 @@ func (self *Quote) Type() string {
 }
 
 func (self *Quote) Eval(env *scope.Scope) value.Value {
-  if len(self.datum) > 0 && self.datum[0] == '\'' {
-    quote := NewQuote(self.datum[1:])
-    return value.NewQuote("(quote " + quote.Eval(env).String() +  ")")
-  }
-  return value.NewQuote(self.datum)
+  fmt.Println("##")
+  fmt.Println(self.ExtRep())
+  return value.NewQuote(self.ExtRep())
 }
 
 func (self *Quote) String() string {
-  return self.datum
+  return ""
 }
 
 func (self *Quote) ExtRep() string {
-  return ""
+  _, ok := self.datum.(*Quote)
+  if !ok {
+    return self.datum.ExtRep()
+  }
+  return "(quote " + self.datum.ExtRep() +  ")"
 }

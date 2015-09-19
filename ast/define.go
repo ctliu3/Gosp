@@ -36,3 +36,7 @@ func (self *Define) Eval(env *scope.Scope) value.Value {
   // Define does not have return val.
   return nil
 }
+
+func (self *Define) ExtRep() string {
+  return ""
+}

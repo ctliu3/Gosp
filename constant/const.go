@@ -15,6 +15,7 @@ const (
   BEGIN = "begin"
   COND = "cond"
   ELSE = "else"
+  CASE = "case"
   UNLESS = "unless"
   WHEN = "when"
   TRUE = "#t"
@@ -27,6 +28,8 @@ const (
   SET = "set!"
   DISPLAY = "display"
   QUOTE = "quote"
+  QUASIQUOTE = "quasiquote"
+  INVOKE = "invoke"
 
   CHAR = "char"
   STRING = "string"
@@ -34,4 +37,5 @@ const (
   FLOAT = "float"
   PROC = "proc"
   BOOL = "bool"
+  LIST = "list"
 )

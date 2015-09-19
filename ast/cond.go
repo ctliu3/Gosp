@@ -13,8 +13,8 @@ type Cond struct {
   clause []Tuple
 }
 
-func NewCond(exprs []Tuple) *Cond {
-  return &Cond{exprs}
+func NewCond(clause []Tuple) *Cond {
+  return &Cond{clause}
 }
 
 func (self *Cond) Type() string {

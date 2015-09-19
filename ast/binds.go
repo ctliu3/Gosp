@@ -27,3 +27,7 @@ func (self *Binds) Eval(env *scope.Scope) value.Value {
 func (self *Binds) String() string {
   return "binds"
 }
+
+func (self *Binds) ExtRep() string {
+  return ""
+}

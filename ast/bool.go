@@ -33,3 +33,10 @@ func (self *Bool) Eval(env *scope.Scope) value.Value {
 func (self *Bool) String() string {
   return fmt.Sprintf("%v", self.value)
 }
+
+func (self *Bool) ExtRep() string {
+  if self.value {
+    return "#t"
+  }
+  return "#f"
+}

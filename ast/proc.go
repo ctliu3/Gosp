@@ -2,6 +2,7 @@ package ast
 
 import (
   "fmt"
+  "bytes"
 
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
@@ -58,6 +59,7 @@ func (self *Proc) Eval(env *scope.Scope) value.Value {
 
 func lambdaCall(closure *value.Closure, args ...value.Value) value.Value {
   t := closure.Lambda.(*Lambda)
+
   env := closure.Env.(*scope.Scope)
   formals := t.Formals.(*Tuple)
   body := t.Body.(Node)
@@ -76,6 +78,23 @@ func lambdaCall(closure *value.Closure, args ...value.Value) value.Value {
   return body.Eval(env)
 }
 
+func (self *Proc) ProcName() string {
+  return self.name
+}
+
 func (self *Proc) String() string {
   return fmt.Sprintf("#<procedure:%v>", self.name)
+}
+
+func (self *Proc) ExtRep() string {
+  var buf bytes.Buffer
+
+  buf.WriteString(fmt.Sprintf("(%v", self.name))
+  for _, arg := range self.args {
+    buf.WriteRune(' ')
+    buf.WriteString(arg.ExtRep())
+  }
+  buf.WriteRune(')')
+
+  return buf.String()
 }

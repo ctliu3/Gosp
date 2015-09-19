@@ -46,11 +46,14 @@ func NewScope(outer *Scope) *Scope {
   objs := map[string]*Object {
     "+": NewObj(procs.NewAdd()),
     "-": NewObj(procs.NewSub()),
+    "*": NewObj(procs.NewMult()),
     "<": NewObj(procs.NewLT()),
     ">": NewObj(procs.NewGT()),
     "<=": NewObj(procs.NewLE()),
     ">=": NewObj(procs.NewGE()),
     "==": NewObj(procs.NewEQ()),
+    "eqv?": NewObj(procs.NewIsEqv()),
+    "class-of": NewObj(procs.NewClassOf()),
   }
   return &Scope{nil, objs}
 }

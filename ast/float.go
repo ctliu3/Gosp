@@ -32,3 +32,7 @@ func (self *Float) Eval(env *scope.Scope) value.Value {
 func (self *Float) String() string {
   return fmt.Sprintf("%v", self.value)
 }
+
+func (self *Float) ExtRep() string {
+  return ""
+}

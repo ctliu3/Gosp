@@ -11,5 +11,6 @@ func NewClosure(env interface{}, lambda interface{}) *Closure {
 }
 
 func (self *Closure) String() string {
+  // TODO
   return "closure"
 }

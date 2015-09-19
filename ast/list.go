@@ -7,27 +7,30 @@ import (
   const_ "github.com/ctliu3/gosp/constant"
 )
 
-// If one Node is Tuple, it means that it is surrounded by `()'.
-type Tuple struct {
+type List struct {
   Nodes []Node
 }
 
-func NewTuple(nodes []Node) *Tuple {
-  return &Tuple{Nodes: nodes}
+func NewList(nodes []Node) *List {
+  return &List{Nodes: nodes}
 }
 
-func (self *Tuple) Type() string {
-  return const_.TUPLE
+func (self *List) Type() string {
+  return const_.LIST
 }
 
-func (self *Tuple) Eval(env *scope.Scope) value.Value {
-  return value.NewInt(9)
+func (self *List) Eval(env *scope.Scope) value.Value {
+  elements := make([]value.Value, len(self.Nodes))
+  for i, node := range self.Nodes {
+    elements[i] = node.Eval(env)
+  }
+  return value.NewList(elements)
 }
 
-func (self *Tuple) String() string {
+func (self *List) String() string {
   var buf bytes.Buffer
 
-  buf.WriteString("#<tuple>\n\t")
+  buf.WriteString("#<list>\n\t")
   for i, node := range self.Nodes {
     if i > 0 {
       buf.WriteString(", ")
@@ -37,7 +40,7 @@ func (self *Tuple) String() string {
   return buf.String()
 }
 
-func (self *Tuple) ExtRep() string {
+func (self *List) ExtRep() string {
   var buf bytes.Buffer
   buf.WriteRune('(')
   for i, node := range self.Nodes {

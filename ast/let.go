@@ -10,10 +10,10 @@ import (
 
 type Let struct {
   bindings Binds
-  body Node
+  body []Node
 }
 
-func NewLet(bindings Binds, body Node) *Let {
+func NewLet(bindings Binds, body []Node) *Let {
   return &Let{bindings, body}
 }
 
@@ -26,9 +26,18 @@ func (self *Let) Eval(env *scope.Scope) value.Value {
   for _, bind := range self.bindings.Bindings {
     local.Insert(bind.var_, scope.NewObj(bind.init.Eval(env)))
   }
-  return self.body.Eval(local)
+
+  var ret value.Value
+  for _, node := range self.body {
+    ret = node.Eval(local)
+  }
+  return ret
 }
 
 func (self *Let) String() string {
   return "let"
+}
+
+func (self *Let) ExtRep() string {
+  return ""
 }

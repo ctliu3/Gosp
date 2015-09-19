@@ -1,13 +1,15 @@
 (define PI 3.1415926)
 
-(define zero?
-  (lambda (n)
-    (if (== n 0) #t #f)))
+(define (is x) (class-of x))
 
-(define positive?
-  (lambda (n)
-    (if (> n 0) #t #f)))
+(define (int? x) (eqv? (is x) 'int))
+(define (char? x) (eqv? (is x) 'char))
+(define (float? x) (eqv? (is x) 'float))
+(define (bool? x) (eqv? (is x) 'bool))
+(define (list? x) (eqv? (is x) 'list))
+(define (quote? x) (eqv? (is x) 'quote))
+(define (string? x) (eqv? (is x) 'string))
 
-(define negative?
-  (lambda (n)
-    (if (< n 0) #t #f)))
+(define (zero? n) (if (== n 0) #t #f))
+(define (positive? n) (if (> n 0) #t #f))
+(define (negative? n) (if (< n 0) #t #f))

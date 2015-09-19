@@ -20,6 +20,7 @@ const (
   TokenIdent // if, define, >, etc
   TokenNumber // only handle int/float, not include complex number
   TokenQuote // '<datum>
+  TokenQuasiQuote // `
   TokenString // "str"
   TokenVect // [1 2 3]
   TokenBool // #t, #f
@@ -157,6 +158,8 @@ func lexWhitespace(l *Lexer) StateFn {
     return lexString
   case r == '\'':
     return lexQuote
+  case r == '`':
+    return lexQuasiQuote
   case r == '#':
     return lexSharp
   case r == '-' || r == '+' || unicode.IsDigit(r): // number or ident
@@ -256,28 +259,11 @@ Loop:
 }
 
 func lexQuote(l *Lexer) StateFn {
-  lparen := 0
-  flag := false
-  l.ignore()
-  for r := l.next(); isAlphaNumeric(r) || isChar(r) || strings.ContainsRune(`"'#`, r); r = l.next() {
-    if r == '(' {
-      flag = true
-      lparen++
-    } else if r == ')' {
-      if lparen > 0 {
-        lparen--
-      }
-      if lparen == 0 {
-        break
-      }
-    }
-  }
-  if lparen != 0 {
-    panic("unexcepted quote?")
-  }
-  if !flag {
-    l.backward()
-  }
+  l.emit(TokenQuote)
+  return lexWhitespace
+}
+
+func lexQuasiQuote(l *Lexer) StateFn {
   l.emit(TokenQuote)
   return lexWhitespace
 }
