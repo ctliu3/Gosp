@@ -1,4 +1,4 @@
-package procs
+package builtin
 
 import (
   "fmt"
@@ -6,6 +6,7 @@ import (
 )
 
 type Display struct {
+  value.Proc
 }
 
 func NewDisplay() *Display {

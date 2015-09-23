@@ -1,14 +1,13 @@
 (define PI 3.1415926)
 
-(define (is x) (class-of x))
-
-(define (int? x) (eqv? (is x) 'int))
-(define (char? x) (eqv? (is x) 'char))
-(define (float? x) (eqv? (is x) 'float))
-(define (bool? x) (eqv? (is x) 'bool))
-(define (list? x) (eqv? (is x) 'list))
-(define (quote? x) (eqv? (is x) 'quote))
-(define (string? x) (eqv? (is x) 'string))
+; predicates
+(define (int? x) (eqv? (class-of x) 'int))
+(define (char? x) (eqv? (class-of x) 'char))
+(define (float? x) (eqv? (class-of x) 'float))
+(define (bool? x) (eqv? (class-of x) 'bool))
+(define (string? x) (eqv? (class-of x) 'string))
+(define (list? x) (eqv? (class-of x) 'list))
+(define (quote? x) (eqv? (class-of x) 'quote))
 
 (define (zero? n) (if (== n 0) #t #f))
 (define (positive? n) (if (> n 0) #t #f))

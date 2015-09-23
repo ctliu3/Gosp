@@ -25,6 +25,8 @@ const (
   TokenVect // [1 2 3]
   TokenBool // #t, #f
   TokenChar // #\a, #\space
+  TokenComma // ,
+  TokenComment // ;
 )
 
 const EOF = -1
@@ -87,7 +89,7 @@ func (self *Lexer) run() {
 }
 
 func (self *Lexer) emit(typ TokenType) {
-  self.tokenChan <- Token{typ, self.expr[self.start:self.pos]}
+  self.tokenChan <- Token{typ, strings.ToLower(self.expr[self.start:self.pos])}
   self.start = self.pos
 }
 
@@ -160,6 +162,10 @@ func lexWhitespace(l *Lexer) StateFn {
     return lexQuote
   case r == '`':
     return lexQuasiQuote
+  case r == ',':
+    return lexComma
+  case r == ';':
+    return lexComment
   case r == '#':
     return lexSharp
   case r == '-' || r == '+' || unicode.IsDigit(r): // number or ident
@@ -264,7 +270,20 @@ func lexQuote(l *Lexer) StateFn {
 }
 
 func lexQuasiQuote(l *Lexer) StateFn {
-  l.emit(TokenQuote)
+  l.emit(TokenQuasiQuote)
+  return lexWhitespace
+}
+
+func lexComma(l *Lexer) StateFn {
+  l.emit(TokenComma)
+  return lexWhitespace
+}
+
+// Just ignore the comments.
+func lexComment(l *Lexer) StateFn {
+  for r := l.next(); r != '\n'; r = l.next() {
+  }
+  l.ignore()
   return lexWhitespace
 }
 

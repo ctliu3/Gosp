@@ -31,8 +31,9 @@ func (self *QuasiQuote) String() string {
 }
 
 func (self *QuasiQuote) ExtRep() string {
-  if self.template.Type() != const_.QUOTE {
-    return self.template.ExtRep()
-  }
-  return "(quote " + self.template.ExtRep() +  ")"
+  return ""
+  //if self.template.Type() != const_.QUOTE {
+    //return self.template.ExtRep()
+  //}
+  //return "(quote " + self.template.ExtRep() +  ")"
 }

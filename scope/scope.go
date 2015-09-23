@@ -3,7 +3,7 @@ package scope
 import (
   "fmt"
   "github.com/ctliu3/gosp/value"
-  "github.com/ctliu3/gosp/procs"
+  "github.com/ctliu3/gosp/value/builtin"
 )
 
 type Scope struct {
@@ -24,14 +24,8 @@ type Object struct {
   Data interface{}
 }
 
-func NewObj(data interface{}) *Object {
-  switch data.(type) {
-  case value.Value: // implement String() method
-    return &Object{Var, data}
-  case procs.Proc: // implement Call() method
-    return &Object{Proc, data}
-  }
-  return nil
+func NewObj(data value.Value) *Object {
+  return &Object{Data: data}
 }
 
 func NewEmtpyScope(outer *Scope) *Scope {
@@ -44,16 +38,17 @@ func NewScope(outer *Scope) *Scope {
   }
 
   objs := map[string]*Object {
-    "+": NewObj(procs.NewAdd()),
-    "-": NewObj(procs.NewSub()),
-    "*": NewObj(procs.NewMult()),
-    "<": NewObj(procs.NewLT()),
-    ">": NewObj(procs.NewGT()),
-    "<=": NewObj(procs.NewLE()),
-    ">=": NewObj(procs.NewGE()),
-    "==": NewObj(procs.NewEQ()),
-    "eqv?": NewObj(procs.NewIsEqv()),
-    "class-of": NewObj(procs.NewClassOf()),
+    "+": NewObj(builtin.NewAdd()),
+    "-": NewObj(builtin.NewSub()),
+    "*": NewObj(builtin.NewMul()),
+    "/": NewObj(builtin.NewDiv()),
+    "<": NewObj(builtin.NewLT()),
+    ">": NewObj(builtin.NewGT()),
+    "<=": NewObj(builtin.NewLE()),
+    ">=": NewObj(builtin.NewGE()),
+    "==": NewObj(builtin.NewEQ()),
+    "eqv?": NewObj(builtin.NewIsEqv()),
+    "class-of": NewObj(builtin.NewClassOf()),
   }
   return &Scope{nil, objs}
 }

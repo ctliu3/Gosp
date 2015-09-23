@@ -54,6 +54,8 @@ func (self *Parser) parse(nodes *[]ast.Node, dep int, typ lexer.TokenType) {
       self.parse(&qqExpr, dep + 1, lexer.TokenQuasiQuote)
       node = ast.NewTuple(qqExpr)
 
+    case lexer.TokenComma:
+
     case lexer.TokenIdent:
       node = ast.NewIdent(token.Name)
 
@@ -76,7 +78,7 @@ func (self *Parser) parse(nodes *[]ast.Node, dep int, typ lexer.TokenType) {
       panic("unexpeced token")
     }
     *nodes = append(*nodes, node)
-    if typ == lexer.TokenQuote {
+    if typ == lexer.TokenQuote || typ == lexer.TokenQuasiQuote {
       break
     }
   }
@@ -130,7 +132,7 @@ func parseNode(node ast.Node) ast.Node {
     case const_.LIST:
       return parseList(t)
     default:
-      return parseProc(t)
+      return parseCall(t)
     }
   case *ast.Ident:
     return parseIdent(&node)
@@ -334,34 +336,29 @@ func parseIdent(node *ast.Node) ast.Node {
   return *node;
 }
 
-func parseProc(node *ast.Tuple) ast.Node {
-  fmt.Println("#parseProc")
+func parseCall(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseCall")
   switch node.Nodes[0].(type) {
   case *ast.Ident:
     // (f x y)
-    name := node.Nodes[0].(*ast.Ident).Name
+    operator := node.Nodes[0].(*ast.Ident)
     args := make([]ast.Node, len(node.Nodes) - 1)
     for i, _ := range args {
       args[i] = parseNode(node.Nodes[i + 1])
     }
-    return ast.NewProc(name, args)
+    return ast.NewCall(operator, args)
 
   case *ast.Tuple:
     // ((lambda (x) (+ x x)) 4)
-    t := node.Nodes[0].(*ast.Tuple)
-    if t.Nodes[0].Type() != const_.LAMBDA {
-      panic(fmt.Errorf("unexpeced procedure: %v", t.Nodes[0].Type()))
-    }
+    // ((if #f + *)) 3 4)
+    callee := node.Nodes[0].(*ast.Tuple)
     args := node.Nodes[1:]
     for _, arg := range args {
       if arg.Type() == const_.TUPLE {
         panic("unexpeced args in lambda proc")
       }
     }
-    lambdaNode := parseLambda(t) // ast.Node
-    lambda := lambdaNode.(*ast.Lambda)
-    return ast.NewInvoke(lambda, args)
-    //return ast.NewLambda(lambda.Formals, lambda.Body, args)
+    return ast.NewCall(parseNode(callee), args)
 
   default:
     panic("unexpeced procedure?")

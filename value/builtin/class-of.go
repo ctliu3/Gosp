@@ -1,4 +1,4 @@
-package procs
+package builtin
 
 import (
   "fmt"
@@ -38,4 +38,8 @@ func (self *ClassOf) Call(args ...value.Value) value.Value {
     return value.NewQuote(const_.PROC)
   }
   return nil
+}
+
+func (self *ClassOf) String() string {
+  return "<#procedurce:class-of>"
 }

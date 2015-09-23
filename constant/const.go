@@ -29,7 +29,9 @@ const (
   DISPLAY = "display"
   QUOTE = "quote"
   QUASIQUOTE = "quasiquote"
-  INVOKE = "invoke"
+  CALL = "call"
+  NOTATION = "notation"
+  COMMA = ","
 
   CHAR = "char"
   STRING = "string"

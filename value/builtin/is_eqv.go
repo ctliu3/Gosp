@@ -1,4 +1,4 @@
-package procs
+package builtin
 
 import (
   "fmt"
@@ -6,6 +6,7 @@ import (
 )
 
 type IsEqv struct {
+  value.Proc
 }
 
 func NewIsEqv() *IsEqv {
