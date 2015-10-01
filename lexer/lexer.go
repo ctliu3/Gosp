@@ -25,7 +25,8 @@ const (
   TokenVect // [1 2 3]
   TokenBool // #t, #f
   TokenChar // #\a, #\space
-  TokenComma // ,
+  TokenUnQuote // ,
+  TokenUnQuoteSplicing // ,@
   TokenComment // ;
 )
 
@@ -163,7 +164,12 @@ func lexWhitespace(l *Lexer) StateFn {
   case r == '`':
     return lexQuasiQuote
   case r == ',':
-    return lexComma
+    if l.next() == '@' {
+      return lexUnQuoteSplicing
+    } else {
+      l.backward()
+      return lexUnQuote
+    }
   case r == ';':
     return lexComment
   case r == '#':
@@ -274,8 +280,13 @@ func lexQuasiQuote(l *Lexer) StateFn {
   return lexWhitespace
 }
 
-func lexComma(l *Lexer) StateFn {
-  l.emit(TokenComma)
+func lexUnQuote(l *Lexer) StateFn {
+  l.emit(TokenUnQuote)
+  return lexWhitespace
+}
+
+func lexUnQuoteSplicing(l *Lexer) StateFn {
+  l.emit(TokenUnQuoteSplicing)
   return lexWhitespace
 }
 

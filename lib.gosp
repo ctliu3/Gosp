@@ -7,8 +7,14 @@
 (define (bool? x) (eqv? (class-of x) 'bool))
 (define (string? x) (eqv? (class-of x) 'string))
 (define (list? x) (eqv? (class-of x) 'list))
-(define (quote? x) (eqv? (class-of x) 'quote))
+(define (symbol? x) (eqv? (class-of x) 'symbol))
 
+; math methods
 (define (zero? n) (if (== n 0) #t #f))
 (define (positive? n) (if (> n 0) #t #f))
 (define (negative? n) (if (< n 0) #t #f))
+(define (abs n) (if (> n 0) n (- 0 n)))
+
+; gcd
+
+; lcm

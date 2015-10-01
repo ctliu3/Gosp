@@ -1,6 +1,9 @@
 package ast
 
 import (
+  "fmt"
+  "reflect"
+
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   const_ "github.com/ctliu3/gosp/constant"
@@ -22,8 +25,17 @@ func (self *QuasiQuote) Type() string {
 }
 
 func (self *QuasiQuote) Eval(env *scope.Scope) value.Value {
-  return nil
-  //return value.NewQuote(self.ExtRep())
+  //self.evalQuasiQuote(env, 0)
+  fmt.Println(reflect.TypeOf(self.template))
+
+  switch val := self.template.(type) {
+  case *Ident:
+    return value.NewSymbol(val.ExtRep())
+  case *List:
+    return self.template.Eval(env)
+  default:
+    panic("unexpected expression")
+  }
 }
 
 func (self *QuasiQuote) String() string {
@@ -37,3 +49,6 @@ func (self *QuasiQuote) ExtRep() string {
   //}
   //return "(quote " + self.template.ExtRep() +  ")"
 }
+
+//func (self *QuasiQuote) SyntaxTree() {
+//}

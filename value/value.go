@@ -1,9 +1,7 @@
 package value
 
 // The String() method is not for debug.
-// Proc -> Proc name
-// Var -> Var
-// Ident -> Ident name
+// Very value (include precedure) should have a value output.
 type Value interface {
   String() string
 }

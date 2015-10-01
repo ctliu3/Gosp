@@ -33,6 +33,7 @@ func ParseFromString(expr string) []ast.Node {
 func (self *Parser) parse(nodes *[]ast.Node, dep int, typ lexer.TokenType) {
   for token := self.l.NextToken(); token.Type != lexer.TokenEOF; token = self.l.NextToken() {
 
+    //fmt.Println(token.Name)
     var node ast.Node
     switch token.Type {
     case lexer.TokenBool:
@@ -45,16 +46,24 @@ func (self *Parser) parse(nodes *[]ast.Node, dep int, typ lexer.TokenType) {
       node = ast.NewString(token.Name)
 
     case lexer.TokenQuote:
-      quoteExpr := []ast.Node{ast.NewIdent("quote")}
+      quoteExpr := []ast.Node{ast.NewIdent(const_.QUOTE)}
       self.parse(&quoteExpr, dep + 1, lexer.TokenQuote)
       node = ast.NewTuple(quoteExpr)
 
     case lexer.TokenQuasiQuote:
-      qqExpr := []ast.Node{ast.NewIdent("quasiquote")}
+      qqExpr := []ast.Node{ast.NewIdent(const_.QUASIQUOTE)}
       self.parse(&qqExpr, dep + 1, lexer.TokenQuasiQuote)
       node = ast.NewTuple(qqExpr)
 
-    case lexer.TokenComma:
+    case lexer.TokenUnQuote:
+      expr := []ast.Node{ast.NewIdent(const_.UNQUOTE)}
+      self.parse(&expr, dep + 1, lexer.TokenUnQuote)
+      node = ast.NewTuple(expr)
+
+    case lexer.TokenUnQuoteSplicing:
+      expr := []ast.Node{ast.NewIdent(const_.UNQUOTE_SPLICING)}
+      self.parse(&expr, dep + 1, lexer.TokenUnQuoteSplicing)
+      node = ast.NewTuple(expr)
 
     case lexer.TokenIdent:
       node = ast.NewIdent(token.Name)
@@ -78,7 +87,9 @@ func (self *Parser) parse(nodes *[]ast.Node, dep int, typ lexer.TokenType) {
       panic("unexpeced token")
     }
     *nodes = append(*nodes, node)
-    if typ == lexer.TokenQuote || typ == lexer.TokenQuasiQuote {
+
+    if ((typ == lexer.TokenQuote || typ == lexer.TokenQuasiQuote) ||
+       (typ == lexer.TokenUnQuote || typ == lexer.TokenUnQuoteSplicing)) {
       break
     }
   }
@@ -121,6 +132,12 @@ func parseNode(node ast.Node) ast.Node {
       return parseCond(t)
     case const_.QUOTE:
       return parseQuote(t)
+    case const_.QUASIQUOTE:
+      return parseQuasiQuote(t)
+    case const_.UNQUOTE:
+      return parseUnQuote(t)
+    case const_.UNQUOTE_SPLICING:
+      return parseUnQuoteSplicing(t)
     case const_.LAMBDA:
       return parseLambda(t)
     case const_.IF:
@@ -131,6 +148,8 @@ func parseNode(node ast.Node) ast.Node {
       return parseImport(t)
     case const_.LIST:
       return parseList(t)
+    case const_.CONS:
+      return parseCons(t)
     default:
       return parseCall(t)
     }
@@ -194,11 +213,19 @@ func parseList(node *ast.Tuple) ast.Node {
   var nodes []ast.Node
   for _, node := range node.Nodes[1:] {
     nodes = append(nodes, parseNode(node))
-    //if i > 0 && nodes[i].Type() != nodes[0].Type() {
-      //panic("list: type not match")
-    //}
   }
   return ast.NewList(nodes)
+}
+
+func parseCons(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseCons")
+  nNode := len(node.Nodes)
+  if nNode != 3 {
+    panic("unexpeced cons expression")
+  }
+  obj1 := parseNode(node.Nodes[1])
+  obj2 := parseNode(node.Nodes[2])
+  return ast.NewCons(obj1, obj2)
 }
 
 func parseDisplay(node *ast.Tuple) ast.Node {
@@ -253,6 +280,76 @@ func parseQuote(node *ast.Tuple) ast.Node {
   return ast.NewQuote(datum)
 }
 
+func parseQuasiQuote(node *ast.Tuple) ast.Node {
+  fmt.Printf("#parseQuasiQuote, %v\n", len(node.Nodes))
+  nNode := len(node.Nodes)
+  if nNode < 2 {
+    panic("unexpeced quasiquote expression")
+  }
+  template := parseQQList(node.Nodes[1], 0)
+
+  return ast.NewQuasiQuote(template)
+}
+
+func parseQQList(node ast.Node, dep int) ast.Node {
+  switch t := node.(type) {
+  case *ast.Ident:
+    return ast.NewSymbol(t.Name)
+
+  case *ast.Tuple:
+    switch t.Nodes[0].Type() {
+    case const_.QUASIQUOTE:
+      ret := ast.NewList([]ast.Node{ast.NewSymbol("quasiquote")})
+      ret.Nodes = append(ret.Nodes, parseQQList(t.Nodes[1], dep + 1))
+      return ret
+
+    case const_.UNQUOTE:
+      if dep == 0 {
+        return parseNode(t.Nodes[1])
+      } else {
+        ret := ast.NewList([]ast.Node{ast.NewSymbol("unquote")})
+        ret.Nodes = append(ret.Nodes, parseQQList(t.Nodes[1], dep - 1))
+        return ret
+      }
+
+    default:
+      var items []ast.Node
+      for _, node := range t.Nodes {
+        items = append(items, parseQQList(node, dep))
+      }
+      return ast.NewList(items)
+    }
+
+  default:
+    return parseNode(node)
+  }
+
+  return nil
+}
+
+func parseUnQuote(node *ast.Tuple) ast.Node {
+  fmt.Printf("#parseUnQuote, %v\n", len(node.Nodes))
+  nNode := len(node.Nodes)
+  if nNode < 2 {
+    panic("unexpeced unquote expression")
+  }
+  template := parseNode(node.Nodes[1])
+
+  return ast.NewUnQuote(template)
+}
+
+func parseUnQuoteSplicing(node *ast.Tuple) ast.Node {
+  fmt.Printf("#parseUnQuoteSplicing, %v\n", len(node.Nodes))
+
+  nNode := len(node.Nodes)
+  if nNode < 2 {
+    panic("unexpeced unquote expression")
+  }
+  template := node.Nodes[1]
+
+  return ast.NewUnQuoteSplicing(template)
+}
+
 func parseIf(node *ast.Tuple) ast.Node {
   fmt.Println("#parseIf")
   nNode := len(node.Nodes)
@@ -283,7 +380,7 @@ func parseLets(node *ast.Tuple) ast.Node {
   case const_.LETREC:
     return ast.NewLetrec(bindings, body)
   default:
-    panic("unexpeced let expression?")
+    panic("unexpected let expression?")
   }
   return nil
 }

@@ -34,8 +34,8 @@ func (self *IsEqv) Call(args ...value.Value) value.Value {
     _, ok = args[1].(*value.String)
   case *value.Float:
     _, ok = args[1].(*value.Float)
-  case *value.Quote:
-    _, ok = args[1].(*value.Quote)
+  case *value.Symbol:
+    _, ok = args[1].(*value.Symbol)
   case *value.List:
     _, ok = args[1].(*value.List)
   case *value.Closure:

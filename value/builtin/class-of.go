@@ -21,21 +21,21 @@ func (self *ClassOf) Call(args ...value.Value) value.Value {
 
   switch args[0].(type) {
   case *value.Bool:
-    return value.NewQuote(const_.BOOL)
+    return value.NewSymbol(const_.BOOL)
   case *value.Int:
-    return value.NewQuote(const_.INT)
+    return value.NewSymbol(const_.INT)
   case *value.Float:
-    return value.NewQuote(const_.FLOAT)
+    return value.NewSymbol(const_.FLOAT)
   case *value.Char:
-    return value.NewQuote(const_.CHAR)
+    return value.NewSymbol(const_.CHAR)
   case *value.List:
-    return value.NewQuote(const_.LIST)
+    return value.NewSymbol(const_.LIST)
   case *value.String:
-    return value.NewQuote(const_.STRING)
-  case *value.Quote:
-    return value.NewQuote(const_.QUOTE)
+    return value.NewSymbol(const_.STRING)
+  case *value.Symbol:
+    return value.NewSymbol(const_.SYMBOL)
   case *value.Closure:
-    return value.NewQuote(const_.PROC)
+    return value.NewSymbol(const_.PROC)
   }
   return nil
 }

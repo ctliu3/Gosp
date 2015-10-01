@@ -1,7 +1,7 @@
 package ast
 
 import (
-  "fmt"
+  //"fmt"
   "github.com/ctliu3/gosp/scope"
   "github.com/ctliu3/gosp/value"
   const_ "github.com/ctliu3/gosp/constant"
@@ -24,9 +24,7 @@ func (self *Quote) Type() string {
 }
 
 func (self *Quote) Eval(env *scope.Scope) value.Value {
-  fmt.Println("##")
-  fmt.Println(self.ExtRep())
-  return value.NewQuote(self.ExtRep())
+  return value.NewSymbol(self.ExtRep())
 }
 
 func (self *Quote) String() string {

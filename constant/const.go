@@ -27,11 +27,15 @@ const (
   BINDS = "binds"
   SET = "set!"
   DISPLAY = "display"
-  QUOTE = "quote"
-  QUASIQUOTE = "quasiquote"
   CALL = "call"
   NOTATION = "notation"
-  COMMA = ","
+  CONS = "cons"
+  SYMBOL = "symbol"
+
+  QUOTE = "quote"
+  QUASIQUOTE = "quasiquote"
+  UNQUOTE = "unquote"
+  UNQUOTE_SPLICING = "unquote-splicing"
 
   CHAR = "char"
   STRING = "string"
