@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "os"
+  "io/ioutil"
   "bufio"
 
   . "github.com/ctliu3/gosp/eval"
@@ -31,8 +32,41 @@ func run() {
   }
 }
 
+func evalFromFile(filename string) {
+  file, err := os.Open(filename)
+  if err != nil {
+    panic(err)
+  }
+  defer file.Close()
+  buffer, err := ioutil.ReadAll(file)
+  if err != nil {
+    panic(err)
+  }
+
+  Eval(string(buffer))
+}
+
+func errMsg() {
+  fmt.Println(
+    "\nUsage:\n" +
+    "\t ./Gosp \t\t\t\t interactive mode\n" +
+    "\t ./Gosp run [script-name] \t run gosp script")
+}
+
 func main() {
   fmt.Printf("Welcome to Gosp v.%s\n", version)
 
-  run()
+  narg := len(os.Args)
+  if narg == 1 {
+    run()
+  } else if narg == 3 {
+    switch os.Args[1] {
+    case "run":
+      evalFromFile(os.Args[2])
+    default:
+      errMsg()
+    }
+  } else {
+    errMsg()
+  }
 }
