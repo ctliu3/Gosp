@@ -149,6 +149,8 @@ func parseNode(node ast.Node) ast.Node {
       return parseList(t)
     case const_.CONS:
       return parseCons(t)
+    case const_.TIME:
+      return parseTime(t)
     case const_.GO:
       return parseGo(t)
     case const_.CHAN:
@@ -229,6 +231,17 @@ func parseCons(node *ast.Tuple) ast.Node {
   obj1 := parseNode(node.Nodes[1])
   obj2 := parseNode(node.Nodes[2])
   return ast.NewCons(obj1, obj2)
+}
+
+func parseTime(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseTime")
+  nNode := len(node.Nodes)
+  if nNode != 2 {
+    panic("unexpected time expression")
+  }
+
+  expr := parseNode(node.Nodes[1])
+  return ast.NewTime(expr)
 }
 
 func parseGo(node *ast.Tuple) ast.Node {
