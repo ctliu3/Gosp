@@ -153,9 +153,9 @@ func lexWhitespace(l *Lexer) StateFn {
     return lexLeftParen
   case r == ')':
     return lexRightParen
-  case r == ']':
-    return lexLeftVect
   case r == '[':
+    return lexLeftVect
+  case r == ']':
     return lexRightVect
   case r == '"':
     return lexString

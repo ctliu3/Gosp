@@ -32,7 +32,6 @@ const (
   CONS = "cons"
   SYMBOL = "symbol"
   GO = "go"
-  CHAN = "chan"
   CHAN_SEND = "<!"
   CHAN_RECV = ">!"
   CHAN_CLOSE = "close!"
@@ -50,4 +49,6 @@ const (
   PROC = "proc"
   BOOL = "bool"
   LIST = "list"
+  CHAN = "chan"
+  VECT = "vector"
 )

@@ -84,8 +84,16 @@ func (self *Parser) parse(nodes *[]ast.Node, dep int, typ lexer.TokenType) {
     case lexer.TokenRParen:
       return
 
+    case lexer.TokenLVect:
+      vect := []ast.Node{ast.NewIdent(const_.VECT)}
+      self.parse(&vect, dep + 1, -1)
+      node = ast.NewTuple(vect)
+
+    case lexer.TokenRVect:
+      return
+
     default:
-      panic("unexpeced token")
+      panic("unexpected token")
     }
     *nodes = append(*nodes, node)
 
@@ -147,6 +155,8 @@ func parseNode(node ast.Node) ast.Node {
       return parseImport(t)
     case const_.LIST:
       return parseList(t)
+    case const_.VECT:
+      return parseVect(t)
     case const_.CONS:
       return parseCons(t)
     case const_.TIME:
@@ -220,6 +230,19 @@ func parseList(node *ast.Tuple) ast.Node {
     nodes = append(nodes, parseNode(node))
   }
   return ast.NewList(nodes)
+}
+
+func parseVect(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseVect")
+  nNode := len(node.Nodes)
+  if nNode == 0 {
+    return ast.NewVect(make([]ast.Node, 0))
+  }
+  var nodes []ast.Node
+  for _, node := range node.Nodes[1:] {
+    nodes = append(nodes, parseNode(node))
+  }
+  return ast.NewVect(nodes)
 }
 
 func parseCons(node *ast.Tuple) ast.Node {
@@ -491,13 +514,13 @@ func parseCall(node *ast.Tuple) ast.Node {
     args := node.Nodes[1:]
     for _, arg := range args {
       if arg.Type() == const_.TUPLE {
-        panic("unexpeced args in lambda proc")
+        panic("unexpected args in lambda proc")
       }
     }
     return ast.NewCall(parseNode(callee), args)
 
   default:
-    panic("unexpeced procedure?")
+    panic("unexpected procedure?")
   }
   return nil
 }

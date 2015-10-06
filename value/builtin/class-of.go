@@ -30,6 +30,8 @@ func (self *ClassOf) Call(args ...value.Value) value.Value {
     return value.NewSymbol(const_.CHAR)
   case *value.List:
     return value.NewSymbol(const_.LIST)
+  case *value.Vect:
+    return value.NewSymbol(const_.VECT)
   case *value.String:
     return value.NewSymbol(const_.STRING)
   case *value.Symbol:

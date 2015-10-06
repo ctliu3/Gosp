@@ -38,6 +38,8 @@ func (self *IsEqv) Call(args ...value.Value) value.Value {
     _, ok = args[1].(*value.Symbol)
   case *value.List:
     _, ok = args[1].(*value.List)
+  case *value.Vect:
+    _, ok = args[1].(*value.Vect)
   case *value.Closure:
     _, ok = args[1].(*value.Closure)
   case *value.Chan:

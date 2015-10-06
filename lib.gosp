@@ -9,6 +9,7 @@
 (define (list? x) (eqv? (class-of x) 'list))
 (define (symbol? x) (eqv? (class-of x) 'symbol))
 (define (chan? x) (eqv? (class-of x) 'chan))
+(define (vector? x) (eqv? (class-of x) 'vector))
 
 ; math methods
 (define (zero? n) (if (== n 0) #t #f))

@@ -55,11 +55,13 @@ func NewScope(outer *Scope) *Scope {
     "close!": NewObj(builtin.NewClose()),
     "max-procs": NewObj(builtin.NewMaxProcs()),
 
+    "vector-length": NewObj(builtin.NewVectLen()),
+    "vector-ref": NewObj(builtin.NewVectRef()),
+
     "display": NewObj(builtin.NewDisplay()),
     "newline": NewObj(builtin.NewNewline()),
 
     "sleep": NewObj(builtin.NewSleep()),
-
     "eqv?": NewObj(builtin.NewIsEqv()),
     "class-of": NewObj(builtin.NewClassOf()),
   }
