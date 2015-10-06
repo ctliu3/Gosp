@@ -47,6 +47,17 @@ func NewScope(outer *Scope) *Scope {
     "<=": NewObj(builtin.NewLE()),
     ">=": NewObj(builtin.NewGE()),
     "==": NewObj(builtin.NewEQ()),
+
+    ">!": NewObj(builtin.NewSend()),
+    "<!": NewObj(builtin.NewRecv()),
+    "close!": NewObj(builtin.NewClose()),
+    "max-procs": NewObj(builtin.NewMaxProcs()),
+
+    "display": NewObj(builtin.NewDisplay()),
+    "newline": NewObj(builtin.NewNewline()),
+
+    "sleep": NewObj(builtin.NewSleep()),
+
     "eqv?": NewObj(builtin.NewIsEqv()),
     "class-of": NewObj(builtin.NewClassOf()),
   }
@@ -58,7 +69,7 @@ func (self *Scope) Insert(name string, obj *Object) {
 }
 
 func (self *Scope) Lookup(name string, recur bool) *Object {
-  fmt.Println("#Lookup, " + name)
+  //fmt.Println("#Lookup, " + name)
   if !recur {
     return self.objects[name]
   }

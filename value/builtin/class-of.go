@@ -36,10 +36,12 @@ func (self *ClassOf) Call(args ...value.Value) value.Value {
     return value.NewSymbol(const_.SYMBOL)
   case *value.Closure:
     return value.NewSymbol(const_.PROC)
+  case *value.Chan:
+    return value.NewSymbol(const_.CHAN)
   }
   return nil
 }
 
 func (self *ClassOf) String() string {
-  return "<#procedurce:class-of>"
+  return "#<procedurce:class-of>"
 }

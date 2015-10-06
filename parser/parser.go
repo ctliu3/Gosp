@@ -3,6 +3,7 @@ package parser
 import (
   "fmt"
   "strings"
+  "reflect"
 
   "github.com/ctliu3/gosp/ast"
   "github.com/ctliu3/gosp/lexer"
@@ -124,8 +125,6 @@ func parseNode(node ast.Node) ast.Node {
       return parseDefine(t)
     case const_.SET:
       return parseSet(t)
-    case const_.DISPLAY:
-      return parseDisplay(t)
     case const_.BEGIN:
       return parseBegin(t)
     case const_.COND:
@@ -150,6 +149,10 @@ func parseNode(node ast.Node) ast.Node {
       return parseList(t)
     case const_.CONS:
       return parseCons(t)
+    case const_.GO:
+      return parseGo(t)
+    case const_.CHAN:
+      return parseChan(t)
     default:
       return parseCall(t)
     }
@@ -228,15 +231,37 @@ func parseCons(node *ast.Tuple) ast.Node {
   return ast.NewCons(obj1, obj2)
 }
 
-func parseDisplay(node *ast.Tuple) ast.Node {
-  fmt.Println("#parseDisplay")
+func parseGo(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseGo")
   nNode := len(node.Nodes)
   if nNode != 2 {
-    panic("unexpeced display expression")
+    panic("unexpected go expression")
   }
-  obj := parseNode(node.Nodes[1])
+  //fmt.Println(reflect.TypeOf(node.Nodes[1]))
+  //var call ast.Node
+  //if tuple, ok := node.Nodes[1].(*ast.Tuple); ok {
+    //call = parseCall(tuple)
+  //} else {
+    //panic("go: unexpected precedure call")
+  //}
+  call := parseNode(node.Nodes[1])
 
-  return ast.NewDisplay(obj)
+  return ast.NewGo(call)
+}
+
+func parseChan(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseChan")
+  nNode := len(node.Nodes)
+  if nNode > 2 {
+    panic("unexpected chan expression")
+  }
+
+  if nNode == 1 {
+    return ast.NewChan(1)
+  }
+  val := node.Nodes[1].Eval(nil)
+  fmt.Println(reflect.TypeOf(val))
+  return ast.NewChan(10)
 }
 
 func parseBegin(node *ast.Tuple) ast.Node {
@@ -386,6 +411,7 @@ func parseLets(node *ast.Tuple) ast.Node {
 }
 
 func parseBinds(node ast.Node) ast.Binds {
+  fmt.Println("#parseBinds")
   if node.Type() != const_.TUPLE {
     panic("let: bad syntax")
   }
@@ -394,11 +420,11 @@ func parseBinds(node ast.Node) ast.Binds {
   binds := ast.NewBinds(nil)
   for _, bind := range nodes {
     if bind.Type() != const_.TUPLE {
-      panic("bad syntax")
+      panic("let: bad syntax")
     }
     t := bind.(*ast.Tuple)
     if len(t.Nodes) != 2 && t.Nodes[0].Type() != const_.IDENT {
-      panic("bad syntax")
+      panic("let: bad syntax")
     }
     binds.Bindings = append(
       binds.Bindings, *ast.NewBind(t.Nodes[0].(*ast.Ident).Name, parseNode(t.Nodes[1])))

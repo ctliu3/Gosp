@@ -8,6 +8,7 @@
 (define (string? x) (eqv? (class-of x) 'string))
 (define (list? x) (eqv? (class-of x) 'list))
 (define (symbol? x) (eqv? (class-of x) 'symbol))
+(define (chan? x) (eqv? (class-of x) 'chan))
 
 ; math methods
 (define (zero? n) (if (== n 0) #t #f))

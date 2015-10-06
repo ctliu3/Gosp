@@ -31,6 +31,12 @@ const (
   NOTATION = "notation"
   CONS = "cons"
   SYMBOL = "symbol"
+  GO = "go"
+  CHAN = "chan"
+  CHAN_SEND = "<!"
+  CHAN_RECV = ">!"
+  CHAN_CLOSE = "close!"
+  SELECT = "select"
 
   QUOTE = "quote"
   QUASIQUOTE = "quasiquote"
