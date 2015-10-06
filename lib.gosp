@@ -17,5 +17,25 @@
 (define (abs n) (if (> n 0) n (- 0 n)))
 
 ; gcd
+(define (gcd a b)
+  (if (zero? b)
+    a
+    (gcd b (remainder a b))))
 
 ; lcm
+(define (lcm a b)
+  (/ (* a b) (gcd a b)))
+
+; even?
+(define even?
+  (lambda (n)
+    (if (zero? n)
+         #t
+         (odd? (- n 1)))))
+
+; odd?
+(define odd?
+  (lambda (n)
+    (if (zero? n)
+         #f
+         (even? (- n 1)))))

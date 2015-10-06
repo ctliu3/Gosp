@@ -147,7 +147,7 @@ func getOperands(args ...value.Value) ([]interface{}, []int)  {
       operands[i] = operand.Value
       types[i] = 2
     default:
-      panic("unexpeced type?")
+      panic("unexpected type?")
     }
   }
 

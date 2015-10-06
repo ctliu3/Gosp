@@ -42,6 +42,8 @@ func NewScope(outer *Scope) *Scope {
     "-": NewObj(builtin.NewSub()),
     "*": NewObj(builtin.NewMul()),
     "/": NewObj(builtin.NewDiv()),
+    "remainder": NewObj(builtin.NewRemainder()),
+
     "<": NewObj(builtin.NewLT()),
     ">": NewObj(builtin.NewGT()),
     "<=": NewObj(builtin.NewLE()),

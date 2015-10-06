@@ -138,3 +138,33 @@ func (self *Div) Call(args ...value.Value) value.Value {
   }
   return value.NewFloat(result)
 }
+
+// remainder
+type Remainder struct {
+  value.Proc
+}
+
+func NewRemainder() *Remainder {
+  return &Remainder{*value.NewProc("remainder")}
+}
+
+func (self *Remainder) Call(args ...value.Value) value.Value {
+  if len(args) != 2 {
+    panic(fmt.Errorf("remainder: arity mismatch, expected 2, given %s\n", len(args)))
+  }
+
+  var n1, n2 int64
+  if arg1, ok := args[0].(*value.Int); !ok {
+    panic(fmt.Errorf("remainder: contract violation, expected: integer?"))
+  } else {
+    n1 = arg1.Value
+  }
+
+  if arg2, ok := args[1].(*value.Int); !ok {
+    panic(fmt.Errorf("remainder: contract violation, expected: integer?"))
+  } else {
+    n2 = arg2.Value
+  }
+
+  return value.NewInt(n1 % n2)
+}

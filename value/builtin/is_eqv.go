@@ -40,6 +40,8 @@ func (self *IsEqv) Call(args ...value.Value) value.Value {
     _, ok = args[1].(*value.List)
   case *value.Closure:
     _, ok = args[1].(*value.Closure)
+  case *value.Chan:
+    _, ok = args[1].(*value.Chan)
   }
   return value.NewBool(ok)
 }

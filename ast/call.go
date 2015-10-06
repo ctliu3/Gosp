@@ -24,7 +24,7 @@ func (self *Call) Type() string {
 }
 
 func (self *Call) Eval(env *scope.Scope) value.Value {
-  fmt.Println("Call#Eval")
+  //fmt.Println("Call#Eval")
 
   obj := self.operator.Eval(env)
 
@@ -42,7 +42,7 @@ func (self *Call) Eval(env *scope.Scope) value.Value {
   case *value.Closure:
     return precedureCall(obj.(*value.Closure), args...)
   default:
-    panic("error")
+    panic("unexpected procedure")
   }
 
   return nil
