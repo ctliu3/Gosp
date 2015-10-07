@@ -1,4 +1,5 @@
 ; https://projecteuler.net/problem=2
+; ans: 4613732
 
 (import lib.gsp)
 
