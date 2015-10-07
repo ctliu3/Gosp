@@ -46,15 +46,22 @@ func NewScope(outer *Scope) *Scope {
 
     "<": NewObj(builtin.NewLT()),
     ">": NewObj(builtin.NewGT()),
+    "=": NewObj(builtin.NewEQ()),
     "<=": NewObj(builtin.NewLE()),
     ">=": NewObj(builtin.NewGE()),
-    "==": NewObj(builtin.NewEQ()),
 
+    // channel, routine
     ">!": NewObj(builtin.NewSend()),
     "<!": NewObj(builtin.NewRecv()),
     "close!": NewObj(builtin.NewClose()),
     "max-procs": NewObj(builtin.NewMaxProcs()),
 
+    // list
+    "car": NewObj(builtin.NewCar()),
+    "cdr": NewObj(builtin.NewCdr()),
+    "null?": NewObj(builtin.NewIsNull()),
+
+    // vector
     "vector-length": NewObj(builtin.NewVectLen()),
     "vector-ref": NewObj(builtin.NewVectRef()),
 
@@ -84,6 +91,8 @@ func (self *Scope) Lookup(name string, recur bool) *Object {
     }
     env = env.outer
   }
+  // TODO
+  fmt.Println("not found")
   return nil
 }
 
@@ -102,7 +111,7 @@ func (self *Scope) DisplayDefine() {
 
   self.outer.DisplayDefine()
   for key := range self.objects {
-    fmt.Printf("%v, ", key)
+    fmt.Printf("[%v: %v] ", key, self.objects[key])
   }
   fmt.Println()
 }

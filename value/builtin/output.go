@@ -5,7 +5,7 @@ import (
   "github.com/ctliu3/gosp/value"
 )
 
-// (display obj )
+// (display obj)
 
 type Display struct {
   value.Proc

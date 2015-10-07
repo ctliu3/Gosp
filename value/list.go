@@ -29,11 +29,25 @@ func NewList(nodes []Value) *List {
   return &List{dummy.next, len(nodes)}
 }
 
-func (self *List) Front() Value {
+func (self *List) Car() Value {
   if self.head != nil {
     return self.head.val
   }
   return nil
+}
+
+func (self *List) Cdr() Value {
+  if self.head.next != nil {
+    return &List{self.head.next, self.len_ - 1}
+  }
+  return &List{nil, 0}
+}
+
+func (self *List) Empty() bool {
+  if self.head == nil {
+    return true
+  }
+  return false
 }
 
 func (self *List) String() string {

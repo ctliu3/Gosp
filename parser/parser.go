@@ -133,6 +133,8 @@ func parseNode(node ast.Node) ast.Node {
       return parseDefine(t)
     case const_.SET:
       return parseSet(t)
+    case const_.OR:
+      return parseOr(t)
     case const_.BEGIN:
       return parseBegin(t)
     case const_.COND:
@@ -304,7 +306,7 @@ func parseBegin(node *ast.Tuple) ast.Node {
   fmt.Println("#parseBegin")
   nNode := len(node.Nodes)
   if nNode < 2 {
-    panic("unexpeced begin expression")
+    panic("unexpected begin expression")
   }
   exprs := make([]ast.Node, len(node.Nodes) - 1)
   for i, _ := range exprs {
@@ -312,6 +314,20 @@ func parseBegin(node *ast.Tuple) ast.Node {
   }
 
   return ast.NewBegin(exprs)
+}
+
+func parseOr(node *ast.Tuple) ast.Node {
+  fmt.Println("#parseOr")
+  nNode := len(node.Nodes)
+  if nNode < 2 {
+    panic("unexpected or expression")
+  }
+  tests := make([]ast.Node, len(node.Nodes) - 1)
+  for i, _ := range tests {
+    tests[i] = parseNode(node.Nodes[i + 1])
+  }
+
+  return ast.NewOr(tests)
 }
 
 func parseCond(node *ast.Tuple) ast.Node {
@@ -482,7 +498,7 @@ func parseLambda(node *ast.Tuple) ast.Node {
   fmt.Println("#parseLambda")
   nNode := len(node.Nodes)
   if nNode != 3 {
-    panic("unexpeced lambda procedure")
+    panic("unexpected lambda procedure")
   }
 
   formals := node.Nodes[1]

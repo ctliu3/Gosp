@@ -16,6 +16,8 @@ const (
   COND = "cond"
   ELSE = "else"
   CASE = "case"
+  AND = "and"
+  OR = "or"
   UNLESS = "unless"
   WHEN = "when"
   TRUE = "#t"
